@@ -3,12 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace NotificationSystem{
+
+	//可能的事件类型
+	public enum NotifyType{
+		Hit,
+		Main_Mission_Passed,//主关卡序数更新
+		InitializeMission,//初始化关卡
+		ClearMission,//清空关卡
+	}
+	// 事件监听委托类型
+	public delegate void EventListenerDelegate(NotifyEvent evt);
 	
 	public class NotificationCenter{
 		
-		// 静态单例，不需要挂载 使用getInstance()取得  
+	// 静态单例，不需要挂载 使用getInstance()取得  
 	private static NotificationCenter instance;  
-	private NotificationCenter() { }  
+	private NotificationCenter() { }//构造函数  
 	public static NotificationCenter getInstance(){  
 		if (instance == null)  {   
 			instance = new NotificationCenter();  
@@ -16,8 +26,10 @@ namespace NotificationSystem{
 		return instance;  
 	}  
 
-		//这个字典用于存储由事件类型对应的委托回调函数
+	//这个字典用于存储由事件类型对应的委托回调函数
 	public Dictionary<NotifyType, EventListenerDelegate> notifications = new Dictionary<NotifyType, EventListenerDelegate>() ;
+
+	
 	
 	  
 	//向字典中添加消息以及对应的处理回调（监听者回调）
@@ -62,13 +74,14 @@ namespace NotificationSystem{
 		notifications.Clear();  
 	}  
 
-	// 消息触发  
+	// 消息触发（广播消息）  
 	public void postNotification(NotifyEvent evt)  {  
 		EventListenerDelegate listenerDelegate;  
 		if(notifications.TryGetValue(evt.Type, out listenerDelegate))  {    
 				// 执行调用所有的监听者  
 			//	Debug.Log(notifications.TryGetValue(evt.Type, out listenerDelegate));
 				//Debug.Log(listenerDelegate);
+				Debug.Log("Post notification " + evt.Type + " from " + evt.Sender);
 				listenerDelegate(evt);  
 		}  
 	}  

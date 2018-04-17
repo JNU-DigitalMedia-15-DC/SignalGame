@@ -9,15 +9,17 @@ public class ComputerManager : MonoBehaviour {
 	//目前功能：接受关卡管理出来的消息广播，更新文字
 	//待完善：1.窗口完全弹出后用dotween更新文字2.窗口退出后清空文字
 	public Text description;
-	private string currentDescription;
+	
 
 	public string[] MissionDescription;
+	private string currentDescription;
 	// Use this for initialization
 
 	void Awake()
 	{
-		NotificationCenter.getInstance ().AddNotification (NotifyType.UpdateComputerTextWithMissionIndex, null);
-		NotificationCenter.getInstance ().registerObserver (NotifyType.UpdateComputerTextWithMissionIndex, UpdateDescription);
+		currentDescription = MissionDescription[0];
+		NotificationCenter.getInstance ().AddNotification (NotifyType.Main_Mission_Passed, null);
+		NotificationCenter.getInstance ().registerObserver (NotifyType.Main_Mission_Passed, UpdateDescription);
 	}
 	void Start () {
 		
@@ -30,7 +32,7 @@ public class ComputerManager : MonoBehaviour {
 
 	public void UpdateDescription(NotifyEvent nE)
 	{
-		currentDescription = MissionDescription[ nE.Params["Index"]-1 ];
+		currentDescription = MissionDescription[ nE.Params["MainIndex"]-1 ];
 	}
 
 	public void ShowDescription()

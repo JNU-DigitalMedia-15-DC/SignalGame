@@ -8,7 +8,7 @@ namespace NotificationSystem {
 	public class NotifyEvent {
 
 		protected Dictionary<string, int> arguments;  //用于存储可能需要传递的参数字典  
-		protected NotifyType type;  //事件类型  类型储存于BasicUtilityBase
+		protected NotifyType type;  //事件类型  
 		protected System.Object sender;    //发送消息事件的对象  在脚本里按情况初始化为对应对象
 
 		//设置get&set接口

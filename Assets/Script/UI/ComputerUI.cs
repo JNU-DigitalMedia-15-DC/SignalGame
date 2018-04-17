@@ -14,6 +14,7 @@ public class ComputerUI : UIEnterOut
       public override void ResetRP()
     {
         base.ResetRP();
+        //World.instance.CM.UpdateDescription();
         World.instance.CM.ShowDescription();
     }
 
