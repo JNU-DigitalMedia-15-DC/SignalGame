@@ -19,10 +19,10 @@ public class UIFade : MonoBehaviour {
 		rTween = I.DOFade (originalAlpha, 0.2f).SetEase (Ease.Linear).SetAutoKill(false).Pause().OnComplete(ResetT);
 	}
 		
-	void ResetT () {
+	public virtual void ResetT () {
 		tween.Rewind ();
 	}
-	void ResetRT () {
+	public virtual void ResetRT () {
 		rTween.Rewind ();
 	}
 

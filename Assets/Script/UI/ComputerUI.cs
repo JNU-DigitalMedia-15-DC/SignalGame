@@ -3,17 +3,17 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class ComputerUI : UIEnterOut
+public class ComputerUI : UIFade
 {
-    public override void ResetP()
+    public override void ResetT()
     {
-        base.ResetP();
+        base.ResetT();
         World.instance.CM.ClearDescription();
     }
 
-      public override void ResetRP()
+      public override void ResetRT()
     {
-        base.ResetRP();
+        base.ResetRT();
         //World.instance.CM.UpdateDescription();
         World.instance.CM.ShowDescription();
     }
