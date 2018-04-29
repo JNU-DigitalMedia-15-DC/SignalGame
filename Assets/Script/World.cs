@@ -11,6 +11,8 @@ public class World : MonoBehaviour {
 	public MissionsManager MM;
 	public BookShelfManager BM;
 
+	public DataController DC;
+
 
 
 	//

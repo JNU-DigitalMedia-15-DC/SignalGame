@@ -3412,6 +3412,8 @@ GameObject:
   m_Component:
   - component: {fileID: 834115018}
   - component: {fileID: 834115017}
+  - component: {fileID: 834115020}
+  - component: {fileID: 834115019}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -3433,6 +3435,7 @@ MonoBehaviour:
   CM: {fileID: 1628677171}
   MM: {fileID: 507584930}
   BM: {fileID: 1696569943}
+  DC: {fileID: 834115020}
 --- !u!4 &834115018
 Transform:
   m_ObjectHideFlags: 0
@@ -3446,6 +3449,30 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &834115019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 834115016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c26d2028d7b1745b29106674f716b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PaperPrefab: {fileID: 1247241218632272, guid: 74a42a57470d1ee46b43c0578022a3a9,
+    type: 2}
+--- !u!114 &834115020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 834115016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: feb9683d68806d548a7b0af7d1d8dde9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &858625770
 GameObject:
   m_ObjectHideFlags: 0
@@ -5495,6 +5522,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 964a34ce4e6eb244f9dc36828e75c2e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lineRenderer: {fileID: 0}
+  paperTransform: {fileID: 0}
 --- !u!120 &1318559988
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -7447,6 +7476,17 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 507584930}
         m_MethodName: InitializeMissions
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 834115019}
+        m_MethodName: InitializeModifyLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

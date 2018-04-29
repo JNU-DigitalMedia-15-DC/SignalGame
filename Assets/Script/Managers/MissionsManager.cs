@@ -10,6 +10,7 @@ public class MissionsManager : MonoBehaviour {
 	private int currentSubIndex = 1;//辅关卡序数
 
 	private int[] subMissionNumber = {2,2,1};//第一二关有两个小关，第三关有一个小关
+	private int[] prefix = {0,2,4};//前缀和
 
 	//下一主关
 	public void DebugNextMainMission()
@@ -64,15 +65,18 @@ public class MissionsManager : MonoBehaviour {
 	//初始化关卡 
 	public void InitializeMissions()
 	{
-		NotifyEvent nEvent = new NotifyEvent(NotifyType.InitializeMission,this.gameObject);
-		Debug.Log("I");
+		
+		Dictionary<string,int> dict = new Dictionary<string, int>(); 
+		dict.Add("LevelIndex",currentSubIndex + prefix[currentMainIndex-1]);
+		NotifyEvent nEvent = new NotifyEvent(NotifyType.InitializeMission,dict,this.gameObject);
+		//Debug.Log("I");
 		NotificationCenter.getInstance().postNotification(nEvent);
 	}
 
 	//清空关卡 
 	public void ClearMissions()
 	{
-		NotifyEvent nEvent = new NotifyEvent(NotifyType.InitializeMission,this.gameObject);
+		NotifyEvent nEvent = new NotifyEvent(NotifyType.ClearMission,this.gameObject);
 		Debug.Log("I");
 		NotificationCenter.getInstance().postNotification(nEvent);
 	}
