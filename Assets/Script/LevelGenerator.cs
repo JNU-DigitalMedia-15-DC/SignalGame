@@ -16,8 +16,8 @@ internal class LevelGenerator : MonoBehaviour {
 
     /// <summary> 初始化用户修改纸片的关卡 </summary>
     public void InitializeModifyLevel() {
-        DataController dc = DataController.getInstance();
-        Debug.Log(dc);
+        DataController dc = DataController.Instance;
+        Debug.Log("datacontroler instance is " + dc);
         // 关卡数据
         LevelData levelData = dc.GetCurrentLevelData();
         // 纸片们数据
@@ -60,7 +60,7 @@ internal class LevelGenerator : MonoBehaviour {
 
     private void CheckUserAnswer() {
         WaveModification ans =
-            DataController.getInstance().GetCurrentLevelData().modification;
+            DataController.Instance.GetCurrentLevelData().modification;
         WaveModification usr = new WaveModification(); // TODO
         if ((usr - ans) / ans < /* theNumber */ 1)
             /* SendMessage("Win this level.") */;

@@ -51,7 +51,7 @@ namespace NotificationSystem{
 			return;  
 		}  
 				
-		Debug.Log("NotificationCenter: New Observer" + type);  
+		//Debug.Log("NotificationCenter: New Observer" + type);  
 
 		EventListenerDelegate myListener = null;  
 		notifications.TryGetValue(type, out myListener);  
@@ -81,7 +81,7 @@ namespace NotificationSystem{
 				// 执行调用所有的监听者  
 			//	Debug.Log(notifications.TryGetValue(evt.Type, out listenerDelegate));
 				//Debug.Log(listenerDelegate);
-				Debug.Log("Post notification " + evt.Type + " from " + evt.Sender);
+				//Debug.Log("Post notification " + evt.Type + " from " + evt.Sender);
 				listenerDelegate(evt);  
 		}  
 	}  
