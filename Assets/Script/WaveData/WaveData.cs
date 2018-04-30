@@ -96,12 +96,17 @@ internal class WaveData {
 
         /// <summary> 在蒙版所属链表最后插入节点 </summary>
         internal void AddLast(WaveAttribute waveAttribute) {
-            Last = Last.Next = new WaveDataNode {
+            Last = new WaveDataNode {
                 Prevous = Last,
                 Next = null,
                 Value = waveAttribute
             };
+            if (Last.Prevous != null)
+                Last.Prevous.Next = Last;
+            else
+                First = Last;
         }
+           
 
         #region 以下为 IEnumerable接口 的实现，遍历将会返回蒙版其下!!原始!!的 WaveAttribute
         public IEnumerator<WaveAttribute> GetEnumerator() {

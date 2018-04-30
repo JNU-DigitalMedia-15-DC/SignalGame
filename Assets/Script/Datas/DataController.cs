@@ -8,13 +8,15 @@ public class DataController : MonoBehaviour {
     private string gameDataFileName = "data.json";
     private int levelDataIndex = 0;
 
-    public static DataController Instance {
-        get { return instance; }
-    }
+    public static DataController getInstance(){  
+		if (instance == null)  {   
+			instance = new DataController();  
+		}  
+		return instance;  
+	}  
 
     void Awake()
     {
-        if(instance == null) { instance = this;}
         LoadGameData();
         NotificationCenter.getInstance ().AddNotification (NotifyType.InitializeMission, null);
 		NotificationCenter.getInstance ().registerObserver (NotifyType.InitializeMission, SetLevelDataIndex);
