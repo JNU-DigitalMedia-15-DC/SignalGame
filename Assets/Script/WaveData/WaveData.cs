@@ -106,6 +106,7 @@ internal class WaveData {
             else
                 First = Last;
         }
+           
 
         #region 以下为 IEnumerable接口 的实现，遍历将会返回蒙版其下!!原始!!的 WaveAttribute
         public IEnumerator<WaveAttribute> GetEnumerator() {

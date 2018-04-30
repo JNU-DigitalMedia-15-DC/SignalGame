@@ -1,29 +1,42 @@
 ﻿using System.IO;
 using UnityEngine;
+using NotificationSystem;
 
-internal class DataController {
+public class DataController : MonoBehaviour {
     private static DataController instance;
     private LevelData[] allLevelData;
     private string gameDataFileName = "data.json";
+    private int levelDataIndex = 0;
 
-    internal static DataController Instance {
-        get { return instance; }
+    public static DataController getInstance(){  
+		if (instance == null)  {   
+			instance = new DataController();  
+		}  
+		return instance;  
+	}  
+
+    void Awake()
+    {
+        LoadGameData();
+        NotificationCenter.getInstance ().AddNotification (NotifyType.InitializeMission, null);
+		NotificationCenter.getInstance ().registerObserver (NotifyType.InitializeMission, SetLevelDataIndex);
+    }
+
+    void SetLevelDataIndex(NotifyEvent nE)
+    {
+        levelDataIndex = nE.Params["LevelIndex"];
     }
 
     /// <summary>
     /// 获取当前关卡的关卡数据
     /// </summary>
     /// <returns> 当前关卡的关卡数据 </returns>
-    internal LevelData GetCurrentLevelData() {
+    public LevelData GetCurrentLevelData() {
         // If we wanted to return different rounds, we could do that here
         // We could store an int representing the current round index in PlayerProgress
-
         return allLevelData[0]; // TODO
     }
 
-    private void OnStart() {
-        LoadGameData();
-    }
 
     /// <summary> 从磁盘文件读取并解析数据 </summary>
     private void LoadGameData() {

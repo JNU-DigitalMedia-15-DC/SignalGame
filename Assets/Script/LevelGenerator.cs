@@ -4,6 +4,8 @@
 internal class LevelGenerator : MonoBehaviour {
     /// <summary> 纸片预置体 </summary>
     public GameObject PaperPrefab;
+
+
     /// <summary> 纸片们的Holder </summary>
     private Transform papersParentTransform;
 
@@ -13,9 +15,11 @@ internal class LevelGenerator : MonoBehaviour {
     }
 
     /// <summary> 初始化用户修改纸片的关卡 </summary>
-    private void InitializeModifyLevel() {
+    public void InitializeModifyLevel() {
+        DataController dc = DataController.getInstance();
+        Debug.Log(dc);
         // 关卡数据
-        LevelData levelData = DataController.Instance.GetCurrentLevelData();
+        LevelData levelData = dc.GetCurrentLevelData();
         // 纸片们数据
         PaperData[] papersData = levelData.papersData;
         // 用户可操作纸片的数据们
@@ -56,7 +60,7 @@ internal class LevelGenerator : MonoBehaviour {
 
     private void CheckUserAnswer() {
         WaveModification ans =
-            DataController.Instance.GetCurrentLevelData().modification;
+            DataController.getInstance().GetCurrentLevelData().modification;
         WaveModification usr = new WaveModification(); // TODO
         if ((usr - ans) / ans < /* theNumber */ 1)
             /* SendMessage("Win this level.") */;
@@ -71,11 +75,11 @@ internal class LevelGenerator : MonoBehaviour {
     private WaveController GetPaper(PaperData paperData) {
         // 实例化纸片，保存 WaveController
         WaveController waveController =
-            Instantiate(
-                PaperPrefab,
-                paperData.position,
-                Quaternion.identity,
-                papersParentTransform).
+           Instantiate(
+                        PaperPrefab,
+                        paperData.position,
+                        Quaternion.identity,
+                        papersParentTransform).
         GetComponent<WaveController>();
 
         // 设置纸片宽和高
