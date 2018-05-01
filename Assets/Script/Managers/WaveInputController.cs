@@ -6,13 +6,15 @@ public class WaveInputController : MonoBehaviour {
 
     // 要更改的 WaveModification
     WaveModification waveModification;
-    // WaveModification 的初态
+    // 手势操作开始前 WaveModification 的初态
     WaveModification originWaveModification;
 
     // 设备对微小操作的“不响应区域”的大小（半径）
     private const float deadZoneSize = .01f;
     // 对 A 的修改的乘数
     private const float aZoomSpeed = 1f;
+    // 对 Omega 的修改的乘数
+    private const float mouseScrollSpeed = 1f;
     // 对 Phi 的修改的乘数
     private const float phiTransSpeed = 1f;
 
@@ -25,88 +27,93 @@ public class WaveInputController : MonoBehaviour {
     // 划动是在修改 A 还是 Phi
     private bool changingANotPhi;
 
-    // #if !UNITY_STANDALONE
-    // #endif
+    // 是否正在捏合（捏合是否已经开始）
+    private bool isPinching = false;
+    // 捏合手势开始时，俩touch之间的距离（缺省值应该和 deadZoneSize 一致）
+    private float originTouchDeltaMag = .01f;
 
     private void Update() {
-        // #if UNITY_EDITOR || UNITY_STANDALONE
-        // // Use key input in editor or standalone
-        // if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-        //     ChangeLane(-1);
-        // } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
-        //     ChangeLane(1);
-        // } else if (Input.GetKeyDown(KeyCode.UpArrow)) {
-        //     Jump();
-        // } else if (Input.GetKeyDown(KeyCode.DownArrow)) {
-        //     if (!m_Sliding)
-        //         Slide();
-        // }
-        // #else
-
-        bool isOnePointInput;
-        Vector2 onePointPos = Vector2.zero;
-        OnePointPhase onePointPhase = OnePointPhase.Unassigned;
+        {
+            bool isOnePointInput;
+            Vector2 onePointPos = Vector2.zero;
+            OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
-        // Unity Editor 或电脑端使用鼠标输入
-        // 如果鼠标被点击……
-        if (isOnePointInput = Input.GetMouseButton(0)) {
-            onePointPos = Input.mousePosition;
-        }
-        if (Input.GetMouseButtonDown(0)) {
-            onePointPhase = OnePointPhase.Began;
-        } else if (Input.GetMouseButtonUp(0)) {
-            onePointPhase = OnePointPhase.Ended;
-        }
+            // Unity Editor 或电脑端使用鼠标输入
+            // 如果鼠标被点击……
+            if (isOnePointInput = Input.GetMouseButton(0)) {
+                onePointPos = Input.mousePosition;
+            }
+            if (Input.GetMouseButtonDown(0)) {
+                onePointPhase = OnePointPhase.Began;
+            } else if (Input.GetMouseButtonUp(0)) {
+                onePointPhase = OnePointPhase.Ended;
+            }
 #else
-        // 移动端使用 touch 输入
-        // 如果设备收到 一个touch ……
-        if (isOnePointInput = (Input.touchCount == 1)) {
-            onePointPos = Input.GetTouch(0).position;
-        }
-        if (Input.GetTouch(0).phase == TouchPhase.Began) {
-            onePointPhase = OnePointPhase.Began;
-        } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
-            onePointPhase = OnePointPhase.Ended;
-        }
+            // 移动端使用 touch 输入
+            // 如果设备收到 一个touch ……
+            if (isOnePointInput = (Input.touchCount == 1)) {
+                onePointPos = Input.GetTouch(0).position;
+            }
+            if (Input.GetTouch(0).phase == TouchPhase.Began) {
+                onePointPhase = OnePointPhase.Began;
+            } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
+                onePointPhase = OnePointPhase.Ended;
+            }
 #endif
-        if (isOnePointInput) {
-            // 如果已经开始划动……
-            if (isSwiping) {
-                // 计算划动总位移矢量
-                Vector2 diff = onePointPos - startPos;
+            if (isOnePointInput) {
+                // 如果已经开始划动……
+                if (isSwiping) {
+                    // 计算划动总位移矢量
+                    Vector2 diff = onePointPos - startPos;
 
-                // 如果上一帧仍在 deadZone 内而这一帧移出了
-                if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
-                    // 判断此次划动是在修改 A 还是 Phi
-                    changingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
+                    // 如果上一帧仍在 deadZone 内而这一帧移出了
+                    if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
+                        // 判断此次划动是在修改 A 还是 Phi
+                        changingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
 
-                    // 标记此次 touch 已经脱离 deadZone
-                    inDeadZone = false;
-                }
+                        // 标记此次 touch 已经脱离 deadZone
+                        inDeadZone = false;
+                    }
 
-                // 如果已经不在 deadZone 内
-                if (!inDeadZone) {
-                    // 要修改 A 还是 Phi
-                    if (changingANotPhi) {
-                        waveModification.A = originWaveModification.A *
-                            (diff.y * aZoomSpeed + 1);
-                    } else {
-                        waveModification.Phi = originWaveModification.Phi +
-                            diff.x * phiTransSpeed;
+                    // 如果已经不在 deadZone 内
+                    if (!inDeadZone) {
+                        // 要修改 A 还是 Phi
+                        if (changingANotPhi) {
+                            waveModification.A = originWaveModification.A *
+                                (diff.y * aZoomSpeed + 1);
+                        } else {
+                            waveModification.Phi = originWaveModification.Phi +
+                                diff.x * phiTransSpeed;
+                        }
                     }
                 }
-            }
 
-            // phase的检查 安排在处理划动操作之后
-            // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
-            // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
-            if (onePointPhase == OnePointPhase.Began) {
-                startPos = onePointPos;
-                isSwiping = true;
-                inDeadZone = true;
-            } else if (onePointPhase == OnePointPhase.Ended) {
-                isSwiping = false;
+                // phase的检查 安排在处理划动操作之后
+                // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
+                // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
+                if (onePointPhase == OnePointPhase.Began) {
+                    startPos = onePointPos;
+                    isSwiping = true;
+                    inDeadZone = true;
+                } else if (onePointPhase == OnePointPhase.Ended) {
+                    isSwiping = false;
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////
+        // 如果鼠标滚轮被滚动
+        {
+            // 获取鼠标滚轮纵向滚动量
+            float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
+            // 如果鼠标滚轮向上滚动
+            if (mouseScrollY >.01f) {
+                waveModification.Omega = originWaveModification.Omega / mouseScrollY;
+            }
+            // 如果鼠标滚轮向下滚动
+            if (mouseScrollY < -.01f) {
+                waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
             }
         }
 
@@ -115,25 +122,21 @@ public class WaveInputController : MonoBehaviour {
             // 记录 两个touch
             Touch touchZero = Input.GetTouch(0);
             Touch touchOne = Input.GetTouch(1);
-
-            // 计算 每个 touch 前一帧的 position
-            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
-
-            // 计算 每个touch 两帧间的向量 的 模长（距离）
-            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            // 计算 两个touch 间的向量 的 模长（距离）
             float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
-
             // 确保模长不小于 deadZoneSize，以防止过大幅度的变化和不必要的错误
-            prevTouchDeltaMag = Mathf.Max(prevTouchDeltaMag, deadZoneSize);
             touchDeltaMag = Mathf.Max(touchDeltaMag, deadZoneSize);
 
-            // 计算两帧间 Omega（应有）的变化量
-            float deltaOmegaDiff = prevTouchDeltaMag / touchDeltaMag;
-
-            // 套用 Omega的变化量
-            waveModification.Omega *= deltaOmegaDiff;
+            // 如果已经开始捏合
+            if (isPinching) {
+                // 计算两帧间 Omega（应有）的变化量
+                float deltaOmegaDiff = originTouchDeltaMag / touchDeltaMag;
+                // 套用 Omega的变化量
+                waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
+            } else {
+                originTouchDeltaMag = touchDeltaMag;
+                isPinching = true;
+            }
         }
-        // #endif
     }
 }
