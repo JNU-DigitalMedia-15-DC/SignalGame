@@ -41,13 +41,23 @@ public class WaveInputController : MonoBehaviour {
         // }
         // #else
 
+#if UNITY_EDITOR || UNITY_STANDALONE
+        // Unity Editor 或电脑端使用鼠标输入
+        // 如果鼠标被点击……
+        if (Input.GetMouseButton(0)) {
+#else
         // 移动端使用 touch 输入
         // 如果设备收到 一个touch ……
         if (Input.touchCount == 1) {
-            // 如果已经开始滑动……
+#endif
+            // 如果已经开始划动……
             if (isSwiping) {
-                // 计算触点总位移矢量
+                // 计算划动总位移矢量
+#if UNITY_EDITOR || UNITY_STANDALONE
+                Vector2 diff = (Vector2)Input.mousePosition - startPos;
+#else
                 Vector2 diff = Input.GetTouch(0).position - startPos;
+#endif
 
                 // 如果上一帧仍在 deadZone 内而这一帧移出了
                 if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
@@ -74,11 +84,20 @@ public class WaveInputController : MonoBehaviour {
             // phase的检查 安排在处理划动操作之后
             // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
             // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
+#if UNITY_EDITOR || UNITY_STANDALONE
+            if (Input.GetMouseButtonDown(0)) {
+                startPos = Input.mousePosition;
+#else
             if (Input.GetTouch(0).phase == TouchPhase.Began) {
                 startPos = Input.GetTouch(0).position;
+#endif
                 isSwiping = true;
                 inDeadZone = true;
+#if UNITY_EDITOR || UNITY_STANDALONE
+            } else if (Input.GetMouseButtonUp(0)) {
+#else
             } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
+#endif
                 isSwiping = false;
             }
         }
