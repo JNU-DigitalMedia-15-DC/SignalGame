@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class WaveInputController : MonoBehaviour {
 
+    WaveModification waveModification;
+
 #if !UNITY_STANDALONE
     protected Vector2 m_StartingTouch;
-	protected bool m_IsSwiping = false;
+    protected bool m_IsSwiping = false;
 #endif
     private void Update() {
 #if UNITY_EDITOR || UNITY_STANDALONE
@@ -59,41 +61,29 @@ public class WaveInputController : MonoBehaviour {
             }
         }
 
-        // If there are two touches on the device...
-        if (Input.touchCount == 2)
-        {
-            // Store both touches.
+        // 如果设备上有 两个touch ……
+        if (Input.touchCount == 2) {
+            // 记录 两个touch
             Touch touchZero = Input.GetTouch(0);
             Touch touchOne = Input.GetTouch(1);
 
-            // Find the position in the previous frame of each touch.
+            // 计算 每个 touch 前一帧的 position
             Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
             Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
-            // Find the magnitude of the vector (the distance) between the touches in each frame.
+            // 计算 每个touch 两帧间的向量 的 模长（距离）
             float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
             float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
-            // Find the difference in the distances between each frame.
-            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+            // 确保模长不小于 deadZoneSize，以防止过大幅度的变化和不必要的错误
+            prevTouchDeltaMag = Mathf.Max(prevTouchDeltaMag, deadZoneSize);
+            touchDeltaMag = Mathf.Max(touchDeltaMag, deadZoneSize);
 
-            // If the camera is orthographic...
-            if (camera.isOrthoGraphic)
-            {
-                // ... change the orthographic size based on the change in distance between the touches.
-                camera.orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
+            // 计算两帧间 Omega（应有）的变化量
+            float deltaOmegaDiff = prevTouchDeltaMag / touchDeltaMag;
 
-                // Make sure the orthographic size never drops below zero.
-                camera.orthographicSize = Mathf.Max(camera.orthographicSize, 0.1f);
-            }
-            else
-            {
-                // Otherwise change the field of view based on the change in distance between the touches.
-                camera.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
-
-                // Clamp the field of view to make sure it's between 0 and 180.
-                camera.fieldOfView = Mathf.Clamp(camera.fieldOfView, 0.1f, 179.9f);
-            }
+            // 套用 Omega的变化量
+            waveModification.Omega *= deltaOmegaDiff;
         }
 #endif
     }
