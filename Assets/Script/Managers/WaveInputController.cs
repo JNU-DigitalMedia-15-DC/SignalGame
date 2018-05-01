@@ -2,66 +2,88 @@ using UnityEngine;
 
 public class WaveInputController : MonoBehaviour {
 
+    // 要更改的 WaveModification
     WaveModification waveModification;
+    // WaveModification 的初态
+    WaveModification originWaveModification;
 
-#if !UNITY_STANDALONE
-    protected Vector2 m_StartingTouch;
-    protected bool m_IsSwiping = false;
-#endif
+    // 设备对微小操作的“不响应区域”的大小（半径）
+    private const float deadZoneSize = .01f;
+    // 对 A 的修改的乘数
+    private const float aZoomSpeed = 1f;
+    // 对 Phi 的修改的乘数
+    private const float phiTransSpeed = 1f;
+
+    // 划动开始的位置
+    private Vector2 startPos;
+    // 是否正在划动（划动是否已经开始）
+    private bool isSwiping = false;
+    // 划动仍在 deadZone 范畴内
+    private bool inDeadZone = true;
+    // 划动是在修改 A 还是 Phi
+    private bool changingANotPhi;
+
+    // #if !UNITY_STANDALONE
+    // #endif
+
     private void Update() {
-#if UNITY_EDITOR || UNITY_STANDALONE
-        // Use key input in editor or standalone
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-            ChangeLane(-1);
-        } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
-            ChangeLane(1);
-        } else if (Input.GetKeyDown(KeyCode.UpArrow)) {
-            Jump();
-        } else if (Input.GetKeyDown(KeyCode.DownArrow)) {
-            if (!m_Sliding)
-                Slide();
-        }
-#else
-        // Use touch input on mobile
+        // #if UNITY_EDITOR || UNITY_STANDALONE
+        // // Use key input in editor or standalone
+        // if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+        //     ChangeLane(-1);
+        // } else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+        //     ChangeLane(1);
+        // } else if (Input.GetKeyDown(KeyCode.UpArrow)) {
+        //     Jump();
+        // } else if (Input.GetKeyDown(KeyCode.DownArrow)) {
+        //     if (!m_Sliding)
+        //         Slide();
+        // }
+        // #else
+
+        // 移动端使用 touch 输入
+        // 如果设备收到 一个touch ……
         if (Input.touchCount == 1) {
-            if (m_IsSwiping) {
-                Vector2 diff = Input.GetTouch(0).position - m_StartingTouch;
+            // 如果已经开始滑动……
+            if (isSwiping) {
+                // 计算触点总位移矢量
+                Vector2 diff = Input.GetTouch(0).position - startPos;
 
-                // Put difference in Screen ratio, but using only width, so the ratio is the same on both
-                // axes (otherwise we would have to swipe more vertically...)
-                diff = new Vector2(diff.x / Screen.width, diff.y / Screen.width);
+                // 如果上一帧仍在 deadZone 内而这一帧移出了
+                if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
+                    // 判断此次划动是在修改 A 还是 Phi
+                    changingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
 
-                if (diff.magnitude > 0.01f) //we set the swip distance to trigger movement to 1% of the screen width
-                {
-                    if (Mathf.Abs(diff.y) > Mathf.Abs(diff.x)) {
-                        if (diff.y < 0) {
-                            Slide();
-                        } else {
-                            Jump();
-                        }
+                    // 标记此次 touch 已经脱离 deadZone
+                    inDeadZone = false;
+                }
+
+                // 如果已经不在 deadZone 内
+                if (!inDeadZone) {
+                    // 要修改 A 还是 Phi
+                    if (changingANotPhi) {
+                        waveModification.A = originWaveModification.A *
+                            (diff.y * aZoomSpeed + 1);
                     } else {
-                        if (diff.x < 0) {
-                            ChangeLane(-1);
-                        } else {
-                            ChangeLane(1);
-                        }
+                        waveModification.Phi = originWaveModification.Phi +
+                            diff.x * phiTransSpeed;
                     }
-
-                    m_IsSwiping = false;
                 }
             }
 
-            // Input check is AFTER the swip test, that way if TouchPhase.Ended happen a single frame after the Began Phase
-            // a swipe can still be registered (otherwise, m_IsSwiping will be set to false and the test wouldn't happen for that began-Ended pair)
+            // phase的检查 安排在处理划动操作之后
+            // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
+            // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
             if (Input.GetTouch(0).phase == TouchPhase.Began) {
-                m_StartingTouch = Input.GetTouch(0).position;
-                m_IsSwiping = true;
+                startPos = Input.GetTouch(0).position;
+                isSwiping = true;
+                inDeadZone = true;
             } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
-                m_IsSwiping = false;
+                isSwiping = false;
             }
         }
 
-        // 如果设备上有 两个touch ……
+        // 如果设备收到 两个touch ……
         if (Input.touchCount == 2) {
             // 记录 两个touch
             Touch touchZero = Input.GetTouch(0);
@@ -85,6 +107,6 @@ public class WaveInputController : MonoBehaviour {
             // 套用 Omega的变化量
             waveModification.Omega *= deltaOmegaDiff;
         }
-#endif
+        // #endif
     }
 }
