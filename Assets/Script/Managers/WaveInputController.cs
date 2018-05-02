@@ -78,15 +78,21 @@ public class WaveInputController : MonoBehaviour {
             onePointPhase = OnePointPhase.Ended;
         }
 
-        // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
+        // 获取鼠标滚轮纵向滚动量
         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
-        // 如果鼠标滚轮向上滚动
-        if (mouseScrollY >.01f) {
-            waveModification.Omega = originWaveModification.Omega / mouseScrollY;
-        }
-        // 如果鼠标滚轮向下滚动
-        if (mouseScrollY < -.01f) {
-            waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
+        // 如果鼠标滚轮被滚动
+        if (Mathf.Abs(mouseScrollY) >.01f) {
+            waveModification = FindWaveModByScreenPos(onePointPos);
+            if (waveModification != null) {
+                // 如果鼠标滚轮向上滚动
+                if (mouseScrollY >.01f) {
+                    waveModification.Omega /= mouseScrollY;
+                }
+                // 如果鼠标滚轮向下滚动
+                if (mouseScrollY < -.01f) {
+                    waveModification.Omega *= -mouseScrollY;
+                }
+            }
         }
 
         // #else
