@@ -5,7 +5,6 @@ internal class LevelGenerator : MonoBehaviour {
     /// <summary> 纸片预置体 </summary>
     public GameObject PaperPrefab;
 
-
     /// <summary> 纸片们的Holder </summary>
     private Transform papersParentTransform;
 
@@ -56,6 +55,12 @@ internal class LevelGenerator : MonoBehaviour {
         // 注：因为用户只操作一个纸片，故只需要对一个 Mask 做修改，约定为第一个
         goal.ModifyByMask(0, levelData.modification);
         waveControllers[3].WaveData = goal;
+
+        // 关卡初始化完成，将数据引用传送给 WaveInputController
+        GetComponent<WaveInputController>().SetDatas(
+            papersData,
+            waveDatas
+        );
     }
 
     private void CheckUserAnswer() {

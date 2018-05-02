@@ -37,32 +37,32 @@ public class WaveInputController : MonoBehaviour {
         Vector2 onePointPos = Vector2.zero;
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
-#if UNITY_EDITOR || UNITY_STANDALONE
-        // Unity Editor 或电脑端使用鼠标输入
+// #if UNITY_EDITOR || UNITY_STANDALONE
+//         // Unity Editor 或电脑端使用鼠标输入
 
-        // 如果鼠标被点击……
-        if (Input.GetMouseButton(0)) {
-            touchCount = 1;
-            onePointPos = Input.mousePosition;
-        }
-        if (Input.GetMouseButtonDown(0)) {
-            onePointPhase = OnePointPhase.Began;
-        } else if (Input.GetMouseButtonUp(0)) {
-            onePointPhase = OnePointPhase.Ended;
-        }
+//         // 如果鼠标被点击……
+//         if (Input.GetMouseButton(0)) {
+//             touchCount = 1;
+//             onePointPos = Input.mousePosition;
+//         }
+//         if (Input.GetMouseButtonDown(0)) {
+//             onePointPhase = OnePointPhase.Began;
+//         } else if (Input.GetMouseButtonUp(0)) {
+//             onePointPhase = OnePointPhase.Ended;
+//         }
 
-        // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
-        float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
-        // 如果鼠标滚轮向上滚动
-        if (mouseScrollY >.01f) {
-            waveModification.Omega = originWaveModification.Omega / mouseScrollY;
-        }
-        // 如果鼠标滚轮向下滚动
-        if (mouseScrollY < -.01f) {
-            waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
-        }
+//         // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
+//         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
+//         // 如果鼠标滚轮向上滚动
+//         if (mouseScrollY >.01f) {
+//             waveModification.Omega = originWaveModification.Omega / mouseScrollY;
+//         }
+//         // 如果鼠标滚轮向下滚动
+//         if (mouseScrollY < -.01f) {
+//             waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
+//         }
 
-#else
+// #else
         // 移动端使用 touch 输入
 
         // 单点触控
@@ -107,7 +107,7 @@ public class WaveInputController : MonoBehaviour {
             }
         }
 
-#endif
+// #endif
 
         // 仍在划动
         if (isSwiping && touchCount == 1) {
