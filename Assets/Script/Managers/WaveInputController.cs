@@ -4,7 +4,6 @@ public class WaveInputController : MonoBehaviour {
 
     enum OnePointPhase { Unassigned, Began, Ended }
 
-
     // 设备对微小操作的“不响应区域”的大小（半径）
     private const float deadZoneSize = .01f;
     // 对 A 的修改的乘数
@@ -65,32 +64,32 @@ public class WaveInputController : MonoBehaviour {
         Vector2 onePointPos = Vector2.zero;
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
-// #if UNITY_EDITOR || UNITY_STANDALONE
-//         // Unity Editor 或电脑端使用鼠标输入
+        // #if UNITY_EDITOR || UNITY_STANDALONE
+        //         // Unity Editor 或电脑端使用鼠标输入
 
-//         // 如果鼠标被点击……
-//         if (Input.GetMouseButton(0)) {
-//             touchCount = 1;
-//             onePointPos = Input.mousePosition;
-//         }
-//         if (Input.GetMouseButtonDown(0)) {
-//             onePointPhase = OnePointPhase.Began;
-//         } else if (Input.GetMouseButtonUp(0)) {
-//             onePointPhase = OnePointPhase.Ended;
-//         }
+        //         // 如果鼠标被点击……
+        //         if (Input.GetMouseButton(0)) {
+        //             touchCount = 1;
+        //             onePointPos = Input.mousePosition;
+        //         }
+        //         if (Input.GetMouseButtonDown(0)) {
+        //             onePointPhase = OnePointPhase.Began;
+        //         } else if (Input.GetMouseButtonUp(0)) {
+        //             onePointPhase = OnePointPhase.Ended;
+        //         }
 
-//         // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
-//         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
-//         // 如果鼠标滚轮向上滚动
-//         if (mouseScrollY >.01f) {
-//             waveModification.Omega = originWaveModification.Omega / mouseScrollY;
-//         }
-//         // 如果鼠标滚轮向下滚动
-//         if (mouseScrollY < -.01f) {
-//             waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
-//         }
+        //         // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
+        //         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
+        //         // 如果鼠标滚轮向上滚动
+        //         if (mouseScrollY >.01f) {
+        //             waveModification.Omega = originWaveModification.Omega / mouseScrollY;
+        //         }
+        //         // 如果鼠标滚轮向下滚动
+        //         if (mouseScrollY < -.01f) {
+        //             waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
+        //         }
 
-// #else
+        // #else
         // 移动端使用 touch 输入
 
         // 单点触控
@@ -128,14 +127,18 @@ public class WaveInputController : MonoBehaviour {
 
                 // 套用 Omega的变化量
                 waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
-            } else {
+            } else if ( // 判断双指是否都在同一个纸片上
+                (waveModification = FindWaveModByScreenPos(onePointPos)) != null &&
+                waveModification == FindWaveModByScreenPos(Input.GetTouch(1).position)
+            ) {
                 // 初始化新捏合
+                originWaveModification = new WaveModification(waveModification);
                 originTouchDeltaMag = touchDeltaMag;
                 isPinching = true;
             }
         }
 
-// #endif
+        // #endif
 
         // 仍在划动
         if (isSwiping && touchCount == 1) {
@@ -152,9 +155,13 @@ public class WaveInputController : MonoBehaviour {
 
         // 开始划动
         if (touchCount == 1 && onePointPhase == OnePointPhase.Began) {
-            startPos = onePointPos;
-            isSwiping = true;
-            inDeadZone = true;
+            waveModification = FindWaveModByScreenPos(onePointPos);
+            if (waveModification != null) {
+                originWaveModification = new WaveModification(waveModification);
+                startPos = onePointPos;
+                isSwiping = true;
+                inDeadZone = true;
+            }
         }
     }
 
