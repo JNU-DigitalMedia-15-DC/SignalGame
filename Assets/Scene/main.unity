@@ -3480,6 +3480,7 @@ GameObject:
   - component: {fileID: 834115018}
   - component: {fileID: 834115017}
   - component: {fileID: 834115019}
+  - component: {fileID: 834115020}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -3527,6 +3528,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PaperPrefab: {fileID: 1247241218632272, guid: 74a42a57470d1ee46b43c0578022a3a9,
     type: 2}
+--- !u!114 &834115020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 834115016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b22d641c1a44d7459bbf19e826ca816, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &858625770
 GameObject:
   m_ObjectHideFlags: 0
