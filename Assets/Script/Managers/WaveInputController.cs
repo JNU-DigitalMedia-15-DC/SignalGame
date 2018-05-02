@@ -64,7 +64,7 @@ public class WaveInputController : MonoBehaviour {
         Vector2 onePointPos = Vector2.zero;
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
-        // #if UNITY_EDITOR || UNITY_STANDALONE
+#if UNITY_EDITOR || UNITY_STANDALONE
         // Unity Editor 或电脑端使用鼠标输入
 
         // 如果鼠标被点击……
@@ -95,56 +95,56 @@ public class WaveInputController : MonoBehaviour {
             }
         }
 
-        // #else
-        // // 移动端使用 touch 输入
+#else
+        // 移动端使用 touch 输入
 
-        // // 单点触控
-        // if ((touchCount = Input.touchCount) == 1) {
-        //     onePointPos = Input.GetTouch(0).position;
-        // }
-        // if (Input.GetTouch(0).phase == TouchPhase.Began) {
-        //     onePointPhase = OnePointPhase.Began;
-        // } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
-        //     onePointPhase = OnePointPhase.Ended;
-        // }
+        // 单点触控
+        if ((touchCount = Input.touchCount) == 1) {
+            onePointPos = Input.GetTouch(0).position;
+        }
+        if (Input.GetTouch(0).phase == TouchPhase.Began) {
+            onePointPhase = OnePointPhase.Began;
+        } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
+            onePointPhase = OnePointPhase.Ended;
+        }
 
-        // // 双点触控
-        // // 终止捏合
-        // if (isPinching && Input.touchCount != 2) {
-        //     isPinching = false;
-        // }
+        // 双点触控
+        // 终止捏合
+        if (isPinching && Input.touchCount != 2) {
+            isPinching = false;
+        }
 
-        // // 处理捏合
-        // if (Input.touchCount == 2) {
-        //     // 记录 两个touch
-        //     Touch touchZero = Input.GetTouch(0);
-        //     Touch touchOne = Input.GetTouch(1);
+        // 处理捏合
+        if (Input.touchCount == 2) {
+            // 记录 两个touch
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
 
-        //     // 计算 两个touch 间的向量 的 模长（距离）
-        //     float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+            // 计算 两个touch 间的向量 的 模长（距离）
+            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
-        //     // 确保模长不小于 deadZoneSize，以防止过大幅度的变化和不必要的错误
-        //     touchDeltaMag = Mathf.Max(touchDeltaMag, deadZoneSize);
+            // 确保模长不小于 deadZoneSize，以防止过大幅度的变化和不必要的错误
+            touchDeltaMag = Mathf.Max(touchDeltaMag, deadZoneSize);
 
-        //     // 如果已经开始捏合
-        //     if (isPinching) {
-        //         // 计算两帧间 Omega（应有）的变化量
-        //         float deltaOmegaDiff = originTouchDeltaMag / touchDeltaMag;
+            // 如果已经开始捏合
+            if (isPinching) {
+                // 计算两帧间 Omega（应有）的变化量
+                float deltaOmegaDiff = originTouchDeltaMag / touchDeltaMag;
 
-        //         // 套用 Omega的变化量
-        //         waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
-        //     } else if ( // 判断双指是否都在同一个纸片上
-        //         (waveModification = FindWaveModByScreenPos(onePointPos)) != null &&
-        //         waveModification == FindWaveModByScreenPos(Input.GetTouch(1).position)
-        //     ) {
-        //         // 初始化新捏合
-        //         originWaveModification = new WaveModification(waveModification);
-        //         originTouchDeltaMag = touchDeltaMag;
-        //         isPinching = true;
-        //     }
-        // }
+                // 套用 Omega的变化量
+                waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
+            } else if ( // 判断双指是否都在同一个纸片上
+                (waveModification = FindWaveModByScreenPos(onePointPos)) != null &&
+                waveModification == FindWaveModByScreenPos(Input.GetTouch(1).position)
+            ) {
+                // 初始化新捏合
+                originWaveModification = new WaveModification(waveModification);
+                originTouchDeltaMag = touchDeltaMag;
+                isPinching = true;
+            }
+        }
 
-        // #endif
+#endif
 
         // 仍在划动
         if (isSwiping && touchCount == 1) {
