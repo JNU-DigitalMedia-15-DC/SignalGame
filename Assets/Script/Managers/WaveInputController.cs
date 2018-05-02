@@ -38,32 +38,34 @@ public class WaveInputController : MonoBehaviour {
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
         // #if UNITY_EDITOR || UNITY_STANDALONE
-        //             // Unity Editor 或电脑端使用鼠标输入
+        // // Unity Editor 或电脑端使用鼠标输入
 
-        //             // 如果鼠标被点击……
-        //             if (isOnePointInput = Input.GetMouseButton(0)) {
-        //                 onePointPos = Input.mousePosition;
-        //             }
-        //             if (Input.GetMouseButtonDown(0)) {
-        //                 onePointPhase = OnePointPhase.Began;
-        //             } else if (Input.GetMouseButtonUp(0)) {
-        //                 onePointPhase = OnePointPhase.Ended;
-        //             }
+        // // 如果鼠标被点击……
+        // if (Input.GetMouseButton(0)) {
+        //     touchCount = 1;
+        //     onePointPos = Input.mousePosition;
+        // }
+        // if (Input.GetMouseButtonDown(0)) {
+        //     onePointPhase = OnePointPhase.Began;
+        // } else if (Input.GetMouseButtonUp(0)) {
+        //     onePointPhase = OnePointPhase.Ended;
+        // }
 
-        //         // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
-        //         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
-        //         // 如果鼠标滚轮向上滚动
-        //         if (mouseScrollY >.01f) {
-        //             waveModification.Omega = originWaveModification.Omega / mouseScrollY;
-        //         }
-        //         // 如果鼠标滚轮向下滚动
-        //         if (mouseScrollY < -.01f) {
-        //             waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
-        //         }
+        // // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
+        // float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
+        // // 如果鼠标滚轮向上滚动
+        // if (mouseScrollY >.01f) {
+        //     waveModification.Omega = originWaveModification.Omega / mouseScrollY;
+        // }
+        // // 如果鼠标滚轮向下滚动
+        // if (mouseScrollY < -.01f) {
+        //     waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
+        // }
 
         // #else
         // 移动端使用 touch 输入
-        // 如果设备收到 一个touch ……
+
+        // 单点触控
         if (isOnePointInput = (Input.touchCount == 1)) {
             onePointPos = Input.GetTouch(0).position;
         }
@@ -72,6 +74,7 @@ public class WaveInputController : MonoBehaviour {
         } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
             onePointPhase = OnePointPhase.Ended;
         }
+
         // 双点触控
         if (Input.touchCount == 2) {
             // 记录 两个touch
@@ -96,44 +99,51 @@ public class WaveInputController : MonoBehaviour {
                 isPinching = true;
             }
         }
+
         // #endif
+
         if (isOnePointInput) {
             // 如果已经开始划动……
             if (isSwiping) {
-                // 计算划动总位移矢量
-                Vector2 diff = onePointPos - startPos;
-
-                // 如果上一帧仍在 deadZone 内而这一帧移出了
-                if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
-                    // 判断此次划动是在修改 A 还是 Phi
-                    changingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
-
-                    // 标记此次 touch 已经脱离 deadZone
-                    inDeadZone = false;
-                }
-
-                // 如果已经不在 deadZone 内
-                if (!inDeadZone) {
-                    // 要修改 A 还是 Phi
-                    if (changingANotPhi) {
-                        waveModification.A = originWaveModification.A *
-                            (diff.y * aZoomSpeed + 1);
-                    } else {
-                        waveModification.Phi = originWaveModification.Phi +
-                            diff.x * phiTransSpeed;
-                    }
-                }
-            }
+            Swipe(startPos, onePointPos);
+        }
 
             // phase的检查 安排在处理划动操作之后
             // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
             // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
             if (onePointPhase == OnePointPhase.Began) {
-                startPos = onePointPos;
-                isSwiping = true;
-                inDeadZone = true;
+            startPos = onePointPos;
+            isSwiping = true;
+            inDeadZone = true;
             } else if (onePointPhase == OnePointPhase.Ended) {
                 isSwiping = false;
+            }
+        }
+    }
+
+    // 处理划动操作
+    private void Swipe(Vector2 startPos, Vector2 onePointPos) {
+        // 计算划动总位移矢量
+        Vector2 diff = onePointPos - startPos;
+
+        // 如果上一帧仍在 deadZone 内而这一帧移出了
+        if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
+            // 判断此次划动是在修改 A 还是 Phi
+            changingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
+
+            // 标记此次 touch 已经脱离 deadZone
+            inDeadZone = false;
+        }
+
+        // 如果已经不在 deadZone 内
+        if (!inDeadZone) {
+            // 要修改 A 还是 Phi
+            if (changingANotPhi) {
+                waveModification.A = originWaveModification.A *
+                    (diff.y * aZoomSpeed + 1);
+            } else {
+                waveModification.Phi = originWaveModification.Phi +
+                    diff.x * phiTransSpeed;
             }
         }
     }
