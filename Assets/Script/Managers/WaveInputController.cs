@@ -33,7 +33,7 @@ public class WaveInputController : MonoBehaviour {
     private float originTouchDeltaMag = .01f;
 
     private void Update() {
-        bool isOnePointInput;
+        int touchCount = 0;
         Vector2 onePointPos = Vector2.zero;
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
@@ -66,7 +66,7 @@ public class WaveInputController : MonoBehaviour {
         // 移动端使用 touch 输入
 
         // 单点触控
-        if (isOnePointInput = (Input.touchCount == 1)) {
+        if ((touchCount = Input.touchCount) == 1) {
             onePointPos = Input.GetTouch(0).position;
         }
         if (Input.GetTouch(0).phase == TouchPhase.Began) {
@@ -76,6 +76,12 @@ public class WaveInputController : MonoBehaviour {
         }
 
         // 双点触控
+        // 终止捏合
+        if (isPinching && Input.touchCount != 2) {
+            isPinching = false;
+        }
+
+        // 处理捏合
         if (Input.touchCount == 2) {
             // 记录 两个touch
             Touch touchZero = Input.GetTouch(0);
@@ -95,6 +101,7 @@ public class WaveInputController : MonoBehaviour {
                 // 套用 Omega的变化量
                 waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
             } else {
+                // 初始化新捏合
                 originTouchDeltaMag = touchDeltaMag;
                 isPinching = true;
             }
@@ -102,22 +109,24 @@ public class WaveInputController : MonoBehaviour {
 
         // #endif
 
-        if (isOnePointInput) {
-            // 如果已经开始划动……
-            if (isSwiping) {
+        // 仍在划动
+        if (isSwiping && touchCount == 1) {
             Swipe(startPos, onePointPos);
         }
 
-            // phase的检查 安排在处理划动操作之后
-            // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
-            // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
-            if (onePointPhase == OnePointPhase.Began) {
+        // 终止划动
+        // 安排在处理划动操作之后
+        // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
+        // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
+        if (touchCount != 1 || onePointPhase == OnePointPhase.Ended) {
+            isSwiping = false;
+        }
+
+        // 开始划动
+        if (touchCount == 1 && onePointPhase == OnePointPhase.Began) {
             startPos = onePointPos;
             isSwiping = true;
             inDeadZone = true;
-            } else if (onePointPhase == OnePointPhase.Ended) {
-                isSwiping = false;
-            }
         }
     }
 
