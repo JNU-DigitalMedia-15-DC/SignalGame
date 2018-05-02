@@ -4,10 +4,6 @@ public class WaveInputController : MonoBehaviour {
 
     enum OnePointPhase { Unassigned, Began, Ended }
 
-    // 要更改的 WaveModification
-    WaveModification waveModification;
-    // 手势操作开始前 WaveModification 的初态
-    WaveModification originWaveModification;
 
     // 设备对微小操作的“不响应区域”的大小（半径）
     private const float deadZoneSize = .01f;
@@ -18,19 +14,51 @@ public class WaveInputController : MonoBehaviour {
     // 对 Phi 的修改的乘数
     private const float phiTransSpeed = 1f;
 
+    // 主相机
+    private Camera mainCamera;
+    // 纸片们的边界们的世界坐标，顺序依次为：左右下上
+    private float[, ] papersBounds = new float[2, 4];
+    // 所有可以被修改的纸片的 WaveModification
+    private WaveModification[] waveModifications = new WaveModification[2];
     // 划动开始的位置
     private Vector2 startPos;
     // 是否正在划动（划动是否已经开始）
     private bool isSwiping = false;
     // 划动仍在 deadZone 范畴内
     private bool inDeadZone = true;
+    // 要更改的 WaveModification
+    private WaveModification waveModification;
+    // 手势操作开始前 WaveModification 的初态
+    private WaveModification originWaveModification;
     // 划动是在修改 A 还是 Phi
     private bool changingANotPhi;
-
     // 是否正在捏合（捏合是否已经开始）
     private bool isPinching = false;
     // 捏合手势开始时，俩touch之间的距离（缺省值应该和 deadZoneSize 一致）
     private float originTouchDeltaMag = .01f;
+
+    /// <summary>
+    /// 帮助 WaveInputController 设置 raycast 所用信息
+    /// </summary>
+    /// <param name="papersData"> 纸片们的源数据 </param>
+    /// <param name="waveDatas"> 实例化后纸片们的 waveData </param>
+    internal void SetDatas(PaperData[] papersData, WaveData[] waveDatas) {
+        // 计算每个纸片的边界，顺序：左右下上
+        for (int i = 0; i < 2; ++i) {
+            papersBounds[i, 0] = papersData[i].position.x;
+            papersBounds[i, 1] = papersData[i].position.x + papersData[i].paperWeight;
+            papersBounds[i, 2] = papersData[i].position.y - papersData[i].paperHeight;
+            papersBounds[i, 3] = papersData[i].position.y;
+
+            // 记录 纸片对应WaveModification
+            waveModifications[i] = waveDatas[i].GetWaveModificationPrototype();
+        }
+    }
+
+    private void Awake() {
+        // 获取主相机
+        mainCamera = Camera.main;
+    }
 
     private void Update() {
         int touchCount = 0;
@@ -155,5 +183,25 @@ public class WaveInputController : MonoBehaviour {
                     diff.x * phiTransSpeed;
             }
         }
+    }
+
+    // 根据屏幕坐标寻找纸片的 WaveModification
+    private WaveModification FindWaveModByScreenPos(Vector2 screenPoint) {
+        // 将 屏幕坐标 转换到 世界坐标
+        Vector2 worldPoint = mainCamera.ScreenToWorldPoint(new Vector3(
+            screenPoint.x,
+            screenPoint.y
+        ));
+
+        // 如果坐标落在某个 可修改纸片 的内部，则即刻返回 此纸片对应的WaveModification
+        for (int i = 0; i < 2; ++i) {
+            if (papersBounds[i, 0] < worldPoint.x && worldPoint.x < papersBounds[i, 1] &&
+                papersBounds[i, 2] < worldPoint.y && worldPoint.y < papersBounds[i, 3]) {
+                return waveModifications[i];
+            }
+        }
+
+        // 否则返回 null 表示未找到
+        return null;
     }
 }

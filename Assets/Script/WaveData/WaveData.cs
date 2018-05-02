@@ -55,6 +55,14 @@ internal class WaveData {
     }
 
     /// <summary>
+    /// 试验性原型：获取 WaveData 的 第一个WaveDataMask 的 WaveModification
+    /// </summary>
+    /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
+    internal WaveModification GetWaveModificationPrototype() { // TODO
+        return waveDataMasks[0].Modification;
+    }
+
+    /// <summary>
     /// 获取波在横坐标为 x 时的函数值
     /// </summary>
     /// <param name="x"> 求值用到的横坐标 x </param>
@@ -106,7 +114,6 @@ internal class WaveData {
             else
                 First = Last;
         }
-           
 
         #region 以下为 IEnumerable接口 的实现，遍历将会返回蒙版其下!!原始!!的 WaveAttribute
         public IEnumerator<WaveAttribute> GetEnumerator() {
