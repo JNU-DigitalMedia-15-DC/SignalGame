@@ -65,78 +65,78 @@ public class WaveInputController : MonoBehaviour {
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
         // #if UNITY_EDITOR || UNITY_STANDALONE
-        //         // Unity Editor 或电脑端使用鼠标输入
+        // Unity Editor 或电脑端使用鼠标输入
 
-        //         // 如果鼠标被点击……
-        //         if (Input.GetMouseButton(0)) {
-        //             touchCount = 1;
-        //             onePointPos = Input.mousePosition;
-        //         }
-        //         if (Input.GetMouseButtonDown(0)) {
-        //             onePointPhase = OnePointPhase.Began;
-        //         } else if (Input.GetMouseButtonUp(0)) {
-        //             onePointPhase = OnePointPhase.Ended;
-        //         }
-
-        //         // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
-        //         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
-        //         // 如果鼠标滚轮向上滚动
-        //         if (mouseScrollY >.01f) {
-        //             waveModification.Omega = originWaveModification.Omega / mouseScrollY;
-        //         }
-        //         // 如果鼠标滚轮向下滚动
-        //         if (mouseScrollY < -.01f) {
-        //             waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
-        //         }
-
-        // #else
-        // 移动端使用 touch 输入
-
-        // 单点触控
-        if ((touchCount = Input.touchCount) == 1) {
-            onePointPos = Input.GetTouch(0).position;
+        // 如果鼠标被点击……
+        if (Input.GetMouseButton(0)) {
+            touchCount = 1;
+            onePointPos = Input.mousePosition;
         }
-        if (Input.GetTouch(0).phase == TouchPhase.Began) {
+        if (Input.GetMouseButtonDown(0)) {
             onePointPhase = OnePointPhase.Began;
-        } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
+        } else if (Input.GetMouseButtonUp(0)) {
             onePointPhase = OnePointPhase.Ended;
         }
 
-        // 双点触控
-        // 终止捏合
-        if (isPinching && Input.touchCount != 2) {
-            isPinching = false;
+        // 如果鼠标滚轮被滚动，获取鼠标滚轮纵向滚动量
+        float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
+        // 如果鼠标滚轮向上滚动
+        if (mouseScrollY >.01f) {
+            waveModification.Omega = originWaveModification.Omega / mouseScrollY;
+        }
+        // 如果鼠标滚轮向下滚动
+        if (mouseScrollY < -.01f) {
+            waveModification.Omega = originWaveModification.Omega * -mouseScrollY;
         }
 
-        // 处理捏合
-        if (Input.touchCount == 2) {
-            // 记录 两个touch
-            Touch touchZero = Input.GetTouch(0);
-            Touch touchOne = Input.GetTouch(1);
+        // #else
+        // // 移动端使用 touch 输入
 
-            // 计算 两个touch 间的向量 的 模长（距离）
-            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+        // // 单点触控
+        // if ((touchCount = Input.touchCount) == 1) {
+        //     onePointPos = Input.GetTouch(0).position;
+        // }
+        // if (Input.GetTouch(0).phase == TouchPhase.Began) {
+        //     onePointPhase = OnePointPhase.Began;
+        // } else if (Input.GetTouch(0).phase == TouchPhase.Ended) {
+        //     onePointPhase = OnePointPhase.Ended;
+        // }
 
-            // 确保模长不小于 deadZoneSize，以防止过大幅度的变化和不必要的错误
-            touchDeltaMag = Mathf.Max(touchDeltaMag, deadZoneSize);
+        // // 双点触控
+        // // 终止捏合
+        // if (isPinching && Input.touchCount != 2) {
+        //     isPinching = false;
+        // }
 
-            // 如果已经开始捏合
-            if (isPinching) {
-                // 计算两帧间 Omega（应有）的变化量
-                float deltaOmegaDiff = originTouchDeltaMag / touchDeltaMag;
+        // // 处理捏合
+        // if (Input.touchCount == 2) {
+        //     // 记录 两个touch
+        //     Touch touchZero = Input.GetTouch(0);
+        //     Touch touchOne = Input.GetTouch(1);
 
-                // 套用 Omega的变化量
-                waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
-            } else if ( // 判断双指是否都在同一个纸片上
-                (waveModification = FindWaveModByScreenPos(onePointPos)) != null &&
-                waveModification == FindWaveModByScreenPos(Input.GetTouch(1).position)
-            ) {
-                // 初始化新捏合
-                originWaveModification = new WaveModification(waveModification);
-                originTouchDeltaMag = touchDeltaMag;
-                isPinching = true;
-            }
-        }
+        //     // 计算 两个touch 间的向量 的 模长（距离）
+        //     float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+        //     // 确保模长不小于 deadZoneSize，以防止过大幅度的变化和不必要的错误
+        //     touchDeltaMag = Mathf.Max(touchDeltaMag, deadZoneSize);
+
+        //     // 如果已经开始捏合
+        //     if (isPinching) {
+        //         // 计算两帧间 Omega（应有）的变化量
+        //         float deltaOmegaDiff = originTouchDeltaMag / touchDeltaMag;
+
+        //         // 套用 Omega的变化量
+        //         waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
+        //     } else if ( // 判断双指是否都在同一个纸片上
+        //         (waveModification = FindWaveModByScreenPos(onePointPos)) != null &&
+        //         waveModification == FindWaveModByScreenPos(Input.GetTouch(1).position)
+        //     ) {
+        //         // 初始化新捏合
+        //         originWaveModification = new WaveModification(waveModification);
+        //         originTouchDeltaMag = touchDeltaMag;
+        //         isPinching = true;
+        //     }
+        // }
 
         // #endif
 
