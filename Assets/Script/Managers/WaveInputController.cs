@@ -16,11 +16,11 @@ public class WaveInputController : MonoBehaviour {
     // 主相机
     private Camera mainCamera;
     // 纸片们的边界们的世界坐标，顺序依次为：左右下上
-    private float[, ] papersBounds = new float[2, 4];
+    private float[][] papersBounds = new float[2][];
     // 所有可以被修改的纸片的 WaveModification
     private WaveModification[] waveModifications = new WaveModification[2];
     // 所有可以被修改的纸片的 WaveController
-    private WaveController[] waveControllers = new WaveController[2];
+    private WaveController[] waveControllers = new WaveController[4];
     // 划动开始的位置
     private Vector2 startPos;
     // 是否正在划动（划动是否已经开始）
@@ -50,16 +50,17 @@ public class WaveInputController : MonoBehaviour {
         WaveData[] waveDatas,
         WaveController[] waveControllers
     ) {
-        // 计算每个纸片的边界，顺序：左右下上
         for (int i = 0; i < 2; ++i) {
-            papersBounds[i, 0] = papersData[i].position.x;
-            papersBounds[i, 1] = papersData[i].position.x + papersData[i].paperWeight;
-            papersBounds[i, 2] = papersData[i].position.y - papersData[i].paperHeight;
-            papersBounds[i, 3] = papersData[i].position.y;
+            // 获取纸片的边界，顺序：左右下上
+            papersBounds[i] = waveControllers[i].GetPaperBound();
 
             // 记录 纸片对应WaveModification
             waveModifications[i] = waveDatas[i].GetWaveModificationPrototype();
             // 记录 纸片对应WaveController
+            this.waveControllers[i] = waveControllers[i];
+        }
+        for (int i = 2; i < 4; ++i) {
+            // 继续记录 纸片对应WaveController
             this.waveControllers[i] = waveControllers[i];
         }
     }
@@ -101,7 +102,7 @@ public class WaveInputController : MonoBehaviour {
                 if (mouseScrollY < -.01f) {
                     waveModification.Omega *= -mouseScrollY;
                 }
-                waveController.Refresh();
+                RefreshPapers();
             }
         }
 
@@ -200,8 +201,15 @@ public class WaveInputController : MonoBehaviour {
                     diff.x * phiTransSpeed;
             }
             // 立刻刷新纸片上波形
-            waveController.Refresh();
+            RefreshPapers();
         }
+    }
+
+    // 在改动后刷新被修改的纸片们
+    private void RefreshPapers() {
+        waveController.Refresh();
+        waveControllers[2].Refresh();
+        waveControllers[3].Refresh();
     }
 
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController
@@ -248,10 +256,10 @@ public class WaveInputController : MonoBehaviour {
     // 点是否在第i张纸片上
     private bool inBound(Vector2 worldPoint, int i) {
         return (
-            papersBounds[i, 0] < worldPoint.x &&
-            worldPoint.x < papersBounds[i, 1] &&
-            papersBounds[i, 2] < worldPoint.y &&
-            worldPoint.y < papersBounds[i, 3]
+            papersBounds[i][0] < worldPoint.x &&
+            worldPoint.x < papersBounds[i][1] &&
+            papersBounds[i][2] < worldPoint.y &&
+            worldPoint.y < papersBounds[i][3]
         );
     }
 }

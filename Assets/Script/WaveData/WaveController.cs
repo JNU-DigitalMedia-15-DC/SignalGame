@@ -43,6 +43,16 @@ public class WaveController : MonoBehaviour {
         set { paperWeight = value; }
     }
 
+    /// <summary> 返回波形展示区的边界坐标数组（左右下上） </summary>
+    internal float[] GetPaperBound() {
+        return new float[] {
+            transform.position.x,
+            transform.position.x + paperWeight,
+            transform.position.y - paperHeight,
+            transform.position.y,
+        };
+    }
+
     private void Start() {
         // 清空 LineRenderer 原有点集，并设置为使用本地空间
         lineRenderer.positionCount = 0;
