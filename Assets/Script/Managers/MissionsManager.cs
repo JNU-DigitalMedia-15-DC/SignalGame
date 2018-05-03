@@ -48,6 +48,7 @@ public class MissionsManager : MonoBehaviour {
 			}
 		else currentSubIndex++;
 		Debug.Log("Current mission is "+ currentMainIndex + " - " + currentSubIndex);
+		World.instance.BGSwaper.Swap();
 	}
 	//上一子关
 	public void DebugPreSubMission()

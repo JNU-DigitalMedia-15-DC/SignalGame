@@ -10,6 +10,7 @@ public class World : MonoBehaviour {
 	public ComputerManager CM;
 	public MissionsManager MM;
 	public BookShelfManager BM;
+	public BGSwaper BGSwaper;
 
 
 
