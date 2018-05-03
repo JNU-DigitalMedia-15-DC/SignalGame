@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="AudioFile" id="{a0767e55-e290-4523-8741-fdc0c8e4e8ab}">
+        <property name="assetPath">
+            <value>Music/MusicBox.wav</value>
+        </property>
+        <property name="isStreaming">
+            <value>true</value>
+        </property>
+        <property name="frequencyInKHz">
+            <value>44.0999985</value>
+        </property>
+        <property name="channelCount">
+            <value>2</value>
+        </property>
+        <property name="length">
+            <value>46.265079365079366</value>
+        </property>
+        <relationship name="masterAssetFolder">
+            <destination>{5664921a-a430-4544-a908-ab85e403d430}</destination>
+        </relationship>
+    </object>
+</objects>
