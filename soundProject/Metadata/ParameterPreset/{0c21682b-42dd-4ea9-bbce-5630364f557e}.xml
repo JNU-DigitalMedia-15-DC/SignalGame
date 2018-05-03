@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{0c21682b-42dd-4ea9-bbce-5630364f557e}">
+        <property name="name">
+            <value>highWaveAmp</value>
+        </property>
+        <relationship name="folder">
+            <destination>{04cac83d-3c03-4f88-b067-86a66a7130ec}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{363e8318-bb5a-45f0-a42f-1fd52bb16254}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{363e8318-bb5a-45f0-a42f-1fd52bb16254}">
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>

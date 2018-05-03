@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{112f5c0e-39cc-47a8-a6ee-164a274f2489}">
+        <property name="name">
+            <value>lowWaveAmp</value>
+        </property>
+        <relationship name="folder">
+            <destination>{04cac83d-3c03-4f88-b067-86a66a7130ec}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{a0264123-df67-40c8-8525-e39341fd64a1}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{a0264123-df67-40c8-8525-e39341fd64a1}">
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>

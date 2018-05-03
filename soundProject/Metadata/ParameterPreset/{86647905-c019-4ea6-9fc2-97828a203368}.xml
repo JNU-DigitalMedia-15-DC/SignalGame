@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{86647905-c019-4ea6-9fc2-97828a203368}">
+        <property name="name">
+            <value>highPass</value>
+        </property>
+        <relationship name="folder">
+            <destination>{04cac83d-3c03-4f88-b067-86a66a7130ec}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{8f23bc5e-89e3-4845-82d0-8235ba037fde}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{8f23bc5e-89e3-4845-82d0-8235ba037fde}">
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{87f8f366-1625-4926-8870-de73608b33e4}">
+        <property name="name">
+            <value>bandPass</value>
+        </property>
+        <relationship name="folder">
+            <destination>{04cac83d-3c03-4f88-b067-86a66a7130ec}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{8d17b14e-2977-4f70-87f8-10325ece25c9}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{8d17b14e-2977-4f70-87f8-10325ece25c9}">
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>

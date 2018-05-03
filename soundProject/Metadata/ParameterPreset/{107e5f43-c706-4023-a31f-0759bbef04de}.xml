@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{107e5f43-c706-4023-a31f-0759bbef04de}">
+        <property name="name">
+            <value>isWin</value>
+        </property>
+        <relationship name="folder">
+            <destination>{04cac83d-3c03-4f88-b067-86a66a7130ec}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{0a1768c9-b78c-40cc-89e4-ba0cdf5acd23}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{0a1768c9-b78c-40cc-89e4-ba0cdf5acd23}">
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>
