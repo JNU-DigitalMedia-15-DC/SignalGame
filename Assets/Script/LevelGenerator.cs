@@ -77,29 +77,34 @@ internal class LevelGenerator : MonoBehaviour {
         DataController dc = DataController.Instance;
         // 关卡数据
         LevelData levelData = dc.GetCurrentLevelData();
-        // 纸片们数据
-        PaperData[] papersData = levelData.papersData;
+        // 纸片数据
+        PaperData paperData = levelData.papersData[0];
+        // 参数组数量
+        int waveAttributesCount = paperData.waveAttributes.Length;
         // 用户可操作纸片的数据们
-        WaveData waveData;
+        WaveData[] waveDatas = new WaveData[waveAttributesCount + 1];
         // 所有纸片的 WaveController们
-        WaveController waveController;
+        WaveController[] waveControllers = new WaveController[waveAttributesCount + 1];
 
         // 设置纸片组 Holder 的位置（纸片组的左上角）
         papersParentTransform.position = levelData.HolderPosition;
 
         // 生成纸片，尚未给予 WaveData
-        waveController = GetPaper(papersData[0]);
+        waveControllers[0] = GetPaper(paperData);
+        // 生成子波纸片
+        for (int i = 0; i < waveAttributesCount; ++i) {
+            Instantiate(waveControllers[0], papersParentTransform);
+        }
 
         // 配置总纸片的 WaveData
-        waveController.WaveData = waveData =
-            new WaveData(papersData[0].waveAttributes);
+        waveControllers[0].WaveData = waveDatas[0] =
+            new WaveData(paperData.waveAttributes);
 
         // 关卡初始化完成，将数据引用传送给 FourierInputController
         FourierInputController fourierInputController = GetComponent<FourierInputController>();
         fourierInputController.SetDatas(
-            papersData,
-            waveData,
-            waveController
+            waveAttributesCount,
+            papersParentTransform
         );
         // 激活 FourierInputController
         fourierInputController.enabled = true;
@@ -110,7 +115,8 @@ internal class LevelGenerator : MonoBehaviour {
             DataController.Instance.GetCurrentLevelData().modification;
         WaveModification usr = new WaveModification(); // TODO
         if ((usr - ans) / ans < /* theNumber */ 1)
-            /* SendMessage("Win this level.") */;
+            /* SendMessage("Win this level.") */
+        ;
     }
 
     /// <summary>
