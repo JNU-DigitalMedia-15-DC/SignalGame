@@ -6,31 +6,26 @@ using NotificationSystem;
 public class MissionsManager : MonoBehaviour {
 
 
-	private int currentMainIndex = 1;//主关卡序数
-	private int currentSubIndex = 1;//辅关卡序数
-
-	private int[] subMissionNumber = {2,2,1};//第一二关有两个小关，第三关有一个小关
-	private int[] prefix = {0,2,4};//前缀和
 
 	//下一主关
 	public void DebugNextMainMission()
 	{
-		currentMainIndex++ ;
+		GameManager.Instance.currentMainIndex++ ;
 		Dictionary<string,int> dict = new Dictionary<string, int>();
-		dict.Add("MainIndex",currentMainIndex);
-		dict.Add("SubIndex",currentSubIndex);
+		dict.Add("MainIndex",GameManager.Instance.currentMainIndex);
+		dict.Add("SubIndex",GameManager.Instance.currentSubIndex);
 		NotifyEvent nEvent = new NotifyEvent(NotifyType.Main_Mission_Passed,dict,this.gameObject);
 		NotificationCenter.getInstance ().postNotification (nEvent);
 	}
 	//上一主关
 	public void DebugPreMainMission()
 	{
-		if(currentMainIndex!= 0)
+		if(GameManager.Instance.currentMainIndex!= 0)
 		{
-			currentMainIndex-- ;
+			GameManager.Instance.currentMainIndex-- ;
 			Dictionary<string,int> dict = new Dictionary<string, int>();
-			dict.Add("MainIndex",currentMainIndex);
-			dict.Add("SubIndex",currentSubIndex);
+			dict.Add("MainIndex",GameManager.Instance.currentMainIndex);
+			dict.Add("SubIndex",GameManager.Instance.currentSubIndex);
 			NotifyEvent nEvent = new NotifyEvent(NotifyType.Main_Mission_Passed,dict,this.gameObject);//关卡更新的时候，需要调用各个管理器的接口，更新相关讯息
 			NotificationCenter.getInstance ().postNotification (nEvent);
 		}
@@ -40,22 +35,22 @@ public class MissionsManager : MonoBehaviour {
 	//下一子关
 	public void DebugNextSubMission()
 	{
-		int subNumber = subMissionNumber[currentMainIndex-1];//获取当前主关卡下子关卡数
-		if(currentSubIndex == subNumber)
+		int subNumber = GameManager.Instance.subMissionNumber[GameManager.Instance.currentMainIndex-1];//获取当前主关卡下子关卡数
+		if(GameManager.Instance.currentSubIndex == subNumber)
 			{
 				DebugNextMainMission();
-				currentSubIndex = 1;
+				GameManager.Instance.currentSubIndex = 1;
 			}
-		else currentSubIndex++;
-		Debug.Log("Current mission is "+ currentMainIndex + " - " + currentSubIndex);
+		else GameManager.Instance.currentSubIndex++;
+		Debug.Log("Current mission is "+ GameManager.Instance.currentMainIndex + " - " + GameManager.Instance.currentSubIndex);
 		World.instance.BGSwaper.Swap();
 	}
 	//上一子关
 	public void DebugPreSubMission()
 	{
-		if(currentSubIndex == 1) return;
-		else currentSubIndex--;
-		Debug.Log("Current mission is "+ currentMainIndex + " - " + currentSubIndex);
+		if(GameManager.Instance.currentSubIndex == 1) return;
+		else GameManager.Instance.currentSubIndex--;
+		Debug.Log("Current mission is "+ GameManager.Instance.currentMainIndex + " - " + GameManager.Instance.currentSubIndex);
 	}
 
 
@@ -68,7 +63,7 @@ public class MissionsManager : MonoBehaviour {
 	{
 		
 		Dictionary<string,int> dict = new Dictionary<string, int>(); 
-		dict.Add("LevelIndex",currentSubIndex + prefix[currentMainIndex-1]);
+		dict.Add("LevelIndex",GameManager.Instance.currentSubIndex + GameManager.Instance.prefix[GameManager.Instance.currentMainIndex-1]);
 		NotifyEvent nEvent = new NotifyEvent(NotifyType.InitializeMission,dict,this.gameObject);
 		//Debug.Log("I");
 		NotificationCenter.getInstance().postNotification(nEvent);
