@@ -59,7 +59,8 @@ internal class LevelGenerator : MonoBehaviour {
         // 关卡初始化完成，将数据引用传送给 WaveInputController
         GetComponent<WaveInputController>().SetDatas(
             papersData,
-            waveDatas
+            waveDatas,
+            waveControllers
         );
     }
 

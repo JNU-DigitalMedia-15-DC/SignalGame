@@ -19,6 +19,8 @@ public class WaveInputController : MonoBehaviour {
     private float[, ] papersBounds = new float[2, 4];
     // 所有可以被修改的纸片的 WaveModification
     private WaveModification[] waveModifications = new WaveModification[2];
+    // 所有可以被修改的纸片的 WaveController
+    private WaveController[] waveControllers = new WaveController[2];
     // 划动开始的位置
     private Vector2 startPos;
     // 是否正在划动（划动是否已经开始）
@@ -28,20 +30,26 @@ public class WaveInputController : MonoBehaviour {
     // 要更改的 WaveModification
     private WaveModification waveModification;
     // 手势操作开始前 WaveModification 的初态
-    private WaveModification originWaveModification;
+    private WaveModification waveModificationOrigin;
+    // 要更改的 WaveController
+    private WaveController waveController;
     // 划动是在修改 A 还是 Phi
-    private bool changingANotPhi;
+    private bool isChangingANotPhi;
     // 是否正在捏合（捏合是否已经开始）
     private bool isPinching = false;
     // 捏合手势开始时，俩touch之间的距离（缺省值应该和 deadZoneSize 一致）
-    private float originTouchDeltaMag = .01f;
+    private float touchDeltaMagOrigin = .01f;
 
     /// <summary>
     /// 帮助 WaveInputController 设置 raycast 所用信息
     /// </summary>
     /// <param name="papersData"> 纸片们的源数据 </param>
     /// <param name="waveDatas"> 实例化后纸片们的 waveData </param>
-    internal void SetDatas(PaperData[] papersData, WaveData[] waveDatas) {
+    internal void SetDatas(
+        PaperData[] papersData,
+        WaveData[] waveDatas,
+        WaveController[] waveControllers
+    ) {
         // 计算每个纸片的边界，顺序：左右下上
         for (int i = 0; i < 2; ++i) {
             papersBounds[i, 0] = papersData[i].position.x;
@@ -51,6 +59,8 @@ public class WaveInputController : MonoBehaviour {
 
             // 记录 纸片对应WaveModification
             waveModifications[i] = waveDatas[i].GetWaveModificationPrototype();
+            // 记录 纸片对应WaveController
+            this.waveControllers[i] = waveControllers[i];
         }
     }
 
@@ -82,8 +92,7 @@ public class WaveInputController : MonoBehaviour {
         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
         // 如果鼠标滚轮被滚动
         if (Mathf.Abs(mouseScrollY) >.01f) {
-            waveModification = FindWaveModByScreenPos(onePointPos);
-            if (waveModification != null) {
+            if (FindWaveRefByScreenPos(onePointPos)) {
                 // 如果鼠标滚轮向上滚动
                 if (mouseScrollY >.01f) {
                     waveModification.Omega /= mouseScrollY;
@@ -92,6 +101,7 @@ public class WaveInputController : MonoBehaviour {
                 if (mouseScrollY < -.01f) {
                     waveModification.Omega *= -mouseScrollY;
                 }
+                waveController.Refresh();
             }
         }
 
@@ -133,12 +143,8 @@ public class WaveInputController : MonoBehaviour {
 
                 // 套用 Omega的变化量
                 waveModification.Omega = originWaveModification.Omega * deltaOmegaDiff;
-            } else if ( // 判断双指是否都在同一个纸片上
-                (waveModification = FindWaveModByScreenPos(onePointPos)) != null &&
-                waveModification == FindWaveModByScreenPos(Input.GetTouch(1).position)
-            ) {
-                // 初始化新捏合
-                originWaveModification = new WaveModification(waveModification);
+            } else if (FindWaveRefByScreenPos(onePointPos, touchOne.position)) {
+                // 双指都在同一个纸片上，初始化新捏合
                 originTouchDeltaMag = touchDeltaMag;
                 isPinching = true;
             }
@@ -161,9 +167,7 @@ public class WaveInputController : MonoBehaviour {
 
         // 开始划动
         if (touchCount == 1 && onePointPhase == OnePointPhase.Began) {
-            waveModification = FindWaveModByScreenPos(onePointPos);
-            if (waveModification != null) {
-                originWaveModification = new WaveModification(waveModification);
+            if (FindWaveRefByScreenPos(onePointPos)) {
                 startPos = onePointPos;
                 isSwiping = true;
                 inDeadZone = true;
@@ -179,7 +183,7 @@ public class WaveInputController : MonoBehaviour {
         // 如果上一帧仍在 deadZone 内而这一帧移出了
         if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
             // 判断此次划动是在修改 A 还是 Phi
-            changingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
+            isChangingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
 
             // 标记此次 touch 已经脱离 deadZone
             inDeadZone = false;
@@ -188,33 +192,66 @@ public class WaveInputController : MonoBehaviour {
         // 如果已经不在 deadZone 内
         if (!inDeadZone) {
             // 要修改 A 还是 Phi
-            if (changingANotPhi) {
-                waveModification.A = originWaveModification.A *
+            if (isChangingANotPhi) {
+                waveModification.A = waveModificationOrigin.A *
                     (diff.y * aZoomSpeed + 1);
             } else {
-                waveModification.Phi = originWaveModification.Phi +
+                waveModification.Phi = waveModificationOrigin.Phi +
                     diff.x * phiTransSpeed;
             }
+            // 立刻刷新纸片上波形
+            waveController.Refresh();
         }
     }
 
-    // 根据屏幕坐标寻找纸片的 WaveModification
-    private WaveModification FindWaveModByScreenPos(Vector2 screenPoint) {
+    // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController
+    private bool FindWaveRefByScreenPos(
+        Vector2 screenPointOne,
+        Vector2? screenPointTwo = null
+    ) {
         // 将 屏幕坐标 转换到 世界坐标
         Vector2 worldPoint = mainCamera.ScreenToWorldPoint(new Vector3(
-            screenPoint.x,
-            screenPoint.y
+            screenPointOne.x,
+            screenPointOne.y
         ));
 
-        // 如果坐标落在某个 可修改纸片 的内部，则即刻返回 此纸片对应的WaveModification
+        // 如果坐标落在某个 可修改纸片的内部
         for (int i = 0; i < 2; ++i) {
-            if (papersBounds[i, 0] < worldPoint.x && worldPoint.x < papersBounds[i, 1] &&
-                papersBounds[i, 2] < worldPoint.y && worldPoint.y < papersBounds[i, 3]) {
-                return waveModifications[i];
+            if (inBound(worldPoint, i)) {
+                // 如果传入了第二个点
+                if (screenPointTwo != null) {
+                    // 将 屏幕坐标 转换到 世界坐标
+                    worldPoint = mainCamera.ScreenToWorldPoint(new Vector3(
+                        screenPointOne.x,
+                        screenPointOne.y
+                    ));
+                    // 如果第二个点不在第i张纸片上，返回 false，并且不更新引用们
+                    if (!inBound(worldPoint, i))
+                        return false;
+                }
+
+                // 设置并拷贝 WaveModification
+                waveModification = waveModifications[i];
+                waveModificationOrigin = new WaveModification(waveModification);
+                // 设置 WaveControllers
+                waveController = waveControllers[i];
+
+                // 返回 true：已找到
+                return true;
             }
         }
 
-        // 否则返回 null 表示未找到
-        return null;
+        // 否则返回 false：未找到
+        return false;
+    }
+
+    // 点是否在第i张纸片上
+    private bool inBound(Vector2 worldPoint, int i) {
+        return (
+            papersBounds[i, 0] < worldPoint.x &&
+            worldPoint.x < papersBounds[i, 1] &&
+            papersBounds[i, 2] < worldPoint.y &&
+            worldPoint.y < papersBounds[i, 3]
+        );
     }
 }
