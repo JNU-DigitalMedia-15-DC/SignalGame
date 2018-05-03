@@ -71,6 +71,38 @@ internal class LevelGenerator : MonoBehaviour {
         waveInputController.enabled = true;
     }
 
+    private void InitializeFourierLevel() {
+        DataController dc = DataController.Instance;
+        // 关卡数据
+        LevelData levelData = dc.GetCurrentLevelData();
+        // 纸片们数据
+        PaperData[] papersData = levelData.papersData;
+        // 用户可操作纸片的数据们
+        WaveData waveData;
+        // 所有纸片的 WaveController们
+        WaveController waveController;
+
+        // 设置纸片组 Holder 的位置（纸片组的左上角）
+        papersParentTransform.position = levelData.HolderPosition;
+
+        // 生成纸片，尚未给予 WaveData
+        waveController = GetPaper(papersData[0]);
+
+        // 配置总纸片的 WaveData
+        waveController.WaveData = waveData =
+            new WaveData(papersData[0].waveAttributes);
+
+        // 关卡初始化完成，将数据引用传送给 FourierInputController
+        FourierInputController fourierInputController = GetComponent<FourierInputController>();
+        fourierInputController.SetDatas(
+            papersData,
+            waveData,
+            waveController
+        );
+        // 激活 FourierInputController
+        fourierInputController.enabled = true;
+    }
+
     private void CheckUserAnswer() {
         WaveModification ans =
             DataController.Instance.GetCurrentLevelData().modification;
