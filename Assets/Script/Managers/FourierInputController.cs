@@ -13,7 +13,8 @@ public class FourierInputController : MonoBehaviour {
     // 划动开始的位置
     private float prevX = -10f;
     Transform papersParentTransform;
-    private int prevIntervalId = 0;
+    private int prevIntervalId = -1;
+    private WaveData.WaveDataNode waveDataNode;
     // 是否正在划动（划动是否已经开始）
     private bool isSwiping = false;
     // 划动仍在 deadZone 范畴内
@@ -23,6 +24,8 @@ public class FourierInputController : MonoBehaviour {
     private int waveAttributesCount = 3;
     private float leftSwipeX;
     private float rightSwipeX;
+    private WaveController[] waveControllers;
+    private WaveData[] waveDatas;
 
     // 区间的左右边界
     private float[] left, right;
@@ -30,11 +33,16 @@ public class FourierInputController : MonoBehaviour {
     enum OnePointPhase { Unassigned, Began, Ended }
 
     internal void SetDatas(
-        int waveAttributesCount,
+        WaveData[] waveDatas,
+        WaveController[] waveControllers,
+        int wavesCount,
         Transform papersParentTransform
     ) {
-        this.waveAttributesCount = waveAttributesCount;
+        this.waveDatas = waveDatas;
+        this.waveControllers = waveControllers;
+        this.waveAttributesCount = wavesCount - 1;
         this.papersParentTransform = papersParentTransform;
+        waveDataNode = waveDatas[0].GetWaveDataNodePrototype();
     }
 
     private void Awake() {
@@ -119,17 +127,19 @@ public class FourierInputController : MonoBehaviour {
 
         newSwipeX = totalSwipeX + diff;
 
-        int step = diff <= 0 ? -1 : 1;
+        leftSwipeX = Mathf.Min(totalSwipeX, newSwipeX);
+        rightSwipeX = Mathf.Max(totalSwipeX, newSwipeX);
+
+        int step = diff < 0 ? -1 : 1;
 
         while (CheckInterval(prevIntervalId + step)) {
             prevIntervalId += step;
         }
 
+        totalSwipeX = newSwipeX;
+
         // if (newSwipeX == marks[nextMarkId])
         //     newSwipeX += 0.01f * (direction == 0 ? -1 : 1);
-
-        // leftSwipeX = Mathf.Min(totalSwipeX, newSwipeX);
-        // rightSwipeX = Mathf.Max(totalSwipeX, newSwipeX);
 
         // while (leftSwipeX < marks[nextMarkId] && marks[nextMarkId] < rightSwipeX) {
         //     if (nextMarkId == 0) {
@@ -182,10 +192,14 @@ public class FourierInputController : MonoBehaviour {
         papersParentTransform.rotation = Quaternion.Euler(Vector3.up * 90);
         papersParentTransform.Rotate(Vector3.right * Mathf.Lerp(0f, -30f, 1 - inverseLerp));
         papersParentTransform.Rotate(Vector3.up * Mathf.Lerp(0f, -45f, 1 - inverseLerp));
+        if (inverseLerp >.99f) {
+            newSwipeX += 1f;
+        }
     }
 
     private void Subtract(int waveId, float inverseLerp) {
-        throw new NotImplementedException();
+        waveDatas[0].GetWaveDataNodePrototype();
+        waveDatas[waveId + 1].GetWaveDataNodePrototype();
     }
 
     private void Push(int waveId, float inverseLerp) {

@@ -65,6 +65,22 @@ internal class WaveData {
     }
 
     /// <summary>
+    /// 试验性原型：获取 WaveData 的 第一个 WaveAttribute
+    /// </summary>
+    /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
+    internal WaveDataNode GetWaveDataNodePrototype() { // TODO
+        return waveDataMasks[0].First;
+    }
+
+    /// <summary>
+    /// 试验性原型：获取 WaveData 的 第一个 WaveAttribute
+    /// </summary>
+    /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
+    internal WaveAttribute GetWaveAttributePrototype() { // TODO
+        return waveDataMasks[0].First.Value;
+    }
+
+    /// <summary>
     /// 获取波在横坐标为 x 时的函数值
     /// </summary>
     /// <param name="x"> 求值用到的横坐标 x </param>
@@ -83,7 +99,7 @@ internal class WaveData {
     }
 
     /// <summary> 覆盖并影响连续一串波参数三元组的蒙版 </summary>
-    private class WaveDataMask : IEnumerable<WaveAttribute> {
+    internal class WaveDataMask : IEnumerable<WaveAttribute> { // TODO
         /// <summary> 蒙版所属波参数节点之首 </summary>
         internal WaveDataNode First;
         /// <summary> 蒙版所属波参数节点之尾 </summary>
@@ -160,7 +176,7 @@ internal class WaveData {
     }
 
     /// <summary> 波的数据的链表节点 </summary>
-    private class WaveDataNode {
+    internal class WaveDataNode {
         internal WaveDataNode Prevous, Next;
         internal WaveAttribute Value;
     }
