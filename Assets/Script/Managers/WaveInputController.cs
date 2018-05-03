@@ -5,13 +5,13 @@ public class WaveInputController : MonoBehaviour {
     enum OnePointPhase { Unassigned, Began, Ended }
 
     // 设备对微小操作的“不响应区域”的大小（半径）
-    private const float deadZoneSize = .01f;
+    private const float deadZoneSize = 10f;
     // 对 A 的修改的乘数
-    private const float aZoomSpeed = 1f;
+    private const float aZoomSpeed = .1f;
     // 对 Omega 的修改的乘数
-    private const float mouseScrollSpeed = 1f;
+    private const float mouseScrollSpeed = .1f;
     // 对 Phi 的修改的乘数
-    private const float phiTransSpeed = 1f;
+    private const float phiTransSpeed = .1f;
 
     // 主相机
     private Camera mainCamera;
@@ -89,18 +89,18 @@ public class WaveInputController : MonoBehaviour {
             onePointPhase = OnePointPhase.Ended;
         }
 
-        // 获取鼠标滚轮纵向滚动量
+        // 获取鼠标滚轮纵向滚动量，计算Omega的变化量
         float mouseScrollY = Input.mouseScrollDelta.y * mouseScrollSpeed;
         // 如果鼠标滚轮被滚动
         if (Mathf.Abs(mouseScrollY) >.01f) {
-            if (FindWaveRefByScreenPos(onePointPos)) {
+            if (FindWaveRefByScreenPos(Input.mousePosition)) {
                 // 如果鼠标滚轮向上滚动
                 if (mouseScrollY >.01f) {
-                    waveModification.Omega /= mouseScrollY;
+                    waveModification.Omega /= mouseScrollY + 1;
                 }
                 // 如果鼠标滚轮向下滚动
                 if (mouseScrollY < -.01f) {
-                    waveModification.Omega *= -mouseScrollY;
+                    waveModification.Omega *= -mouseScrollY + 1;
                 }
                 RefreshPapers();
             }
