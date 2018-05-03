@@ -43,12 +43,6 @@ public class WaveController : MonoBehaviour {
         set { paperWeight = value; }
     }
 
-    private void Awake() {
-        // 计算初始化时点的总数
-        initialPositionCount =
-            Convert.ToInt32(Math.Ceiling(paperWeight / deltaX));
-    }
-
     private void Start() {
         // 清空 LineRenderer 原有点集，并设置为使用本地空间
         lineRenderer.positionCount = 0;
@@ -63,6 +57,12 @@ public class WaveController : MonoBehaviour {
         // 计算 Waveform 对象的 Transform
         lineRenderer.GetComponent<Transform>().localPosition =
             new Vector3(0, -paperHeight / 2, 0);
+
+        // 计算初始化时点的总数
+        // 注：Awake()时 paperWeight 仍然未被 LevelGenerator 设置，
+        // 故必须等到 Start() 时计算点数
+        initialPositionCount =
+            Convert.ToInt32(Math.Ceiling(paperWeight / deltaX));
 
         // 初始化 LineRenderer
         InitializeLineRender();
