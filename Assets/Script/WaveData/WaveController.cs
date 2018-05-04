@@ -28,6 +28,7 @@ public class WaveController : MonoBehaviour {
 
     /// <summary> 当前 WaveController 所采用的波形数据源 </summary>
     internal WaveData WaveData {
+        get { return waveData;}
         set { waveData = value; }
     }
 

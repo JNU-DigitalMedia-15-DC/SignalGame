@@ -1,4 +1,5 @@
 using UnityEngine;
+using NotificationSystem;
 
 public class WaveInputController : MonoBehaviour {
 
@@ -7,7 +8,7 @@ public class WaveInputController : MonoBehaviour {
     // 设备对微小操作的“不响应区域”的大小（半径）
     private const float deadZoneSize = 10f;
     // 对 A 的修改的乘数
-    private const float aZoomSpeed = .1f;
+    private const float aZoomSpeed = .05f;
     // 对 Omega 的修改的乘数
     private const float mouseScrollSpeed = .1f;
     // 对 Phi 的修改的乘数
@@ -25,6 +26,7 @@ public class WaveInputController : MonoBehaviour {
     private Vector2 startPos;
     // 是否正在划动（划动是否已经开始）
     private bool isSwiping = false;
+    private bool isCheckContinue = true;
     // 划动仍在 deadZone 范畴内
     private bool inDeadZone = true;
     // 要更改的 WaveModification
@@ -56,6 +58,7 @@ public class WaveInputController : MonoBehaviour {
 
             // 记录 纸片对应WaveModification
             waveModifications[i] = waveDatas[i].GetWaveModificationPrototype();
+            //Debug.Log("A: "+ waveModifications[i].A + " O: "+ waveModifications[i].Omega + " P: " + waveModifications[i].Phi);
             // 记录 纸片对应WaveController
             this.waveControllers[i] = waveControllers[i];
         }
@@ -102,7 +105,7 @@ public class WaveInputController : MonoBehaviour {
                 if (mouseScrollY < -.01f) {
                     waveModification.Omega *= -mouseScrollY + 1;
                 }
-                RefreshPapers();
+                RefreshPapers();//可以直接更新omega
             }
         }
 
@@ -202,14 +205,57 @@ public class WaveInputController : MonoBehaviour {
             }
             // 立刻刷新纸片上波形
             RefreshPapers();
+           // Debug.Log("A: " + waveModification.A + " O: " + waveModification.Omega + "P: " + waveModification.Phi);
         }
     }
 
+   
     // 在改动后刷新被修改的纸片们
     private void RefreshPapers() {
-        waveController.Refresh();
-        waveControllers[2].Refresh();
+          if(CheckUserAnswer(waveControllers[2]))
+        {
+            //存在数据处理问题 
+            //如果判断成功的一瞬间输入仍然在检测 则会不断加关导致数组越界
+            //进入某ui后 点选确定下关 再初始化纸片
+            isPinching = false;
+            isSwiping = false;
+            isChangingANotPhi = true;
+            inDeadZone = true;
+            World.instance.MM.ClearMissions();
+            World.instance.MM.DebugNextSubMission();
+            return;
+        }
+        
+        waveController.Refresh();//被改动的波
+        waveControllers[2].Refresh();//sum波
         waveControllers[3].Refresh();
+      
+
+        //Debug.Log(CheckUserAnswer(waveControllers[2]));
+        //WaveData wd = waveControllers[2].WaveData;
+        // Debug.Log("3rd's Modification attribute : "+"A: " + wd.GetWaveModificationPrototype().A + " O: " + wd.GetWaveModificationPrototype().Omega + "P: " + wd.GetWaveModificationPrototype().Phi);
+    }
+
+     private bool CheckUserAnswer(WaveController sum) {
+         bool isPassed;
+        WaveModification ans =
+            DataController.Instance.GetCurrentLevelData().modification;
+        //DataController.Instance.GetCurrentLevelData().papersData[2].
+        WaveModification usr = sum.WaveData.GetWaveModificationPrototype(); // TODO
+        //Debug.Log(usr);
+        float[] usrAttributes = { usr.A,usr.Omega,usr.Phi };
+        float[] ansAttributes = { ans.A,ans.Omega,ans.Phi };
+        float[] ratio = new float[3];
+        //看三个属性的比值是否都大于0.9，如果有一个不大于就返回false即不通过
+        for(int i=0;i<3;i++)
+        {
+            ratio[i] = Mathf.Abs(usrAttributes[i])/Mathf.Abs(ansAttributes[i]);
+            //Debug.Log(ratio[i]);
+            if(ratio[i]<0.9f) return false;
+        }
+        Debug.Log("Ratio A: " + ratio[0] + " Ratio O: " + ratio[1] + "Ratio P: " + ratio[2]);
+        return true;
+        
     }
 
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController
