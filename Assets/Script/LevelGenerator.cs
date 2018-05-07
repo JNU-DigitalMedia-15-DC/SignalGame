@@ -8,6 +8,8 @@ internal class LevelGenerator : MonoBehaviour {
     /// <summary> 纸片们的Holder </summary>
     private Transform papersParentTransform;
 
+
+
     private void Awake() {
         // 初始化Holder
         papersParentTransform = new GameObject("Papers").transform;
@@ -47,7 +49,6 @@ internal class LevelGenerator : MonoBehaviour {
         //     但会自动立即反应其下 加数纸片 的修改
         //     即创建自己的 waveDataMasks，记录别人的 WaveDataMask们
         WaveData sum = waveControllers[2].WaveData = new WaveData(waveDatas);
-
         // 配置目标纸片的 WaveData
         // 注：目标纸片 初始化的结果为最原始的 和视图纸片 叠加一个 目标修改
         //             且初始化后不能被修改
@@ -58,7 +59,7 @@ internal class LevelGenerator : MonoBehaviour {
         // 注：因为用户只操作一个纸片，故只需要对一个 Mask 做修改，约定为第一个
         goal.ModifyByMask(0, levelData.modification);
         waveControllers[3].WaveData = goal;
-
+      
         // 关卡初始化完成，将数据引用传送给 WaveInputController
         WaveInputController waveInputController = GetComponent<WaveInputController>();
         waveInputController.SetDatas(
@@ -70,13 +71,6 @@ internal class LevelGenerator : MonoBehaviour {
         waveInputController.enabled = true;
     }
 
-    private void CheckUserAnswer() {
-        WaveModification ans =
-            DataController.Instance.GetCurrentLevelData().modification;
-        WaveModification usr = new WaveModification(); // TODO
-        if ((usr - ans) / ans < /* theNumber */ 1)
-            /* SendMessage("Win this level.") */;
-    }
 
     /// <summary>
     /// 根据 PaperData 的位置和高宽信息构造一个纸片
