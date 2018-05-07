@@ -115,15 +115,6 @@ internal class LevelGenerator : MonoBehaviour {
         fourierInputController.enabled = true;
     }
 
-    private void CheckUserAnswer() {
-        WaveModification ans =
-            DataController.Instance.GetCurrentLevelData().modification;
-        WaveModification usr = new WaveModification(); // TODO
-        if ((usr - ans) / ans < /* theNumber */ 1)
-            /* SendMessage("Win this level.") */
-        ;
-    }
-
     /// <summary>
     /// 根据 PaperData 的位置和高宽信息构造一个纸片
     /// </summary>
