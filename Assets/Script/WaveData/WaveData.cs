@@ -61,12 +61,14 @@ internal class WaveData {
 
     /// <summary>
     /// 试验性原型：获取 WaveData 的 第一个WaveDataMask 的 WaveModification
+
     /// 获取可操作纸片的modification，默认一个
     /// </summary>
     /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
     internal WaveModification GetWaveModificationPrototype() { // TODO
         return waveDataMasks[0].Modification;
     }
+
     /// <summary>
     /// 试验性原型：获取 总和纸片wavedata的两个mask总和为modification
     /// </summary>

@@ -16,6 +16,7 @@ public class WaveInputController : MonoBehaviour {
     // 对 Phi 的修改的乘数
     private const float phiTransSpeed = .025f;
 
+
     // 主相机
     private Camera mainCamera;
     // 纸片们的边界们的世界坐标，顺序依次为：左右下上
@@ -28,7 +29,6 @@ public class WaveInputController : MonoBehaviour {
     private Vector2 startPos;
     // 是否正在划动（划动是否已经开始）
     private bool isSwiping = false;
-    private bool isCheckContinue = true;
     // 划动仍在 deadZone 范畴内
     private bool inDeadZone = true;
     // 要更改的 WaveModification
@@ -60,7 +60,6 @@ public class WaveInputController : MonoBehaviour {
 
             // 记录 纸片对应WaveModification
             waveModifications[i] = waveDatas[i].GetWaveModificationPrototype();
-            //Debug.Log("A: "+ waveModifications[i].A + " O: "+ waveModifications[i].Omega + " P: " + waveModifications[i].Phi);
             // 记录 纸片对应WaveController
             this.waveControllers[i] = waveControllers[i];
         }
