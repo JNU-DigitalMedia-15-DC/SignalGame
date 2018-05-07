@@ -73,17 +73,20 @@ internal class LevelGenerator : MonoBehaviour {
         waveInputController.enabled = true;
     }
 
+    /// <summary> 初始化傅里叶变换与滤波关卡 </summary>
     private void InitializeFourierLevel() {
         DataController dc = DataController.Instance;
-        // 关卡数据
+        /// <summary> 关卡数据 </summary>
+        /// <remarks> 外部数据 </remarks>
         LevelData levelData = dc.GetCurrentLevelData();
-        // 纸片数据
+        /// <summary> 纸片数据 </summary>
+        /// <remarks> 外部数据 </remarks>
         PaperData paperData = levelData.papersData[0];
-        // 纸片总数量
+        /// <summary> 纸片总数量 </summary>
         int papersCount = paperData.waveAttributes.Length + 1;
-        // 用户可操作纸片的数据们
+        /// <summary> 纸片们的 WaveData们 </summary>
         WaveData[] waveDatas = new WaveData[papersCount];
-        // 所有纸片的 WaveController们
+        /// <summary> 纸片们的 WaveController们 </summary>
         WaveController[] waveControllers = new WaveController[papersCount];
 
         // 设置纸片组 Holder 的位置（纸片组的左上角）
@@ -91,29 +94,25 @@ internal class LevelGenerator : MonoBehaviour {
 
         // 生成纸片，尚未给予 WaveData
         waveControllers[0] = GetPaper(paperData);
-        // 生成子波纸片
+        // 拷贝生成子波纸片
         for (int i = 1; i < papersCount; ++i) {
             waveControllers[i] = Instantiate(waveControllers[0], papersParentTransform);
         }
 
-        // 配置总纸片的 WaveData
-        waveControllers[0].WaveData = waveDatas[0] =
-            new WaveData(paperData.waveAttributes);
-        // 配置子波纸片的 WaveData
-        for (int i = 1; i < papersCount; ++i) {
-            WaveAttribute[] wa = new WaveAttribute[] { paperData.waveAttributes[i - 1] };
-            wa[0].A = 0;
-            waveControllers[i].WaveData = waveDatas[i] = new WaveData(wa);
+        // 配置所有纸片的 WaveData
+        for (int i = 0; i < papersCount; ++i) {
+            waveControllers[i].WaveData = waveDatas[i] =
+                new WaveData(paperData.waveAttributes);
         }
 
         // 关卡初始化完成，将数据引用传送给 FourierInputController
         FourierInputController fourierInputController = GetComponent<FourierInputController>();
         fourierInputController.SetDatas(
-            waveDatas,
-            waveControllers,
-            papersCount,
-            papersParentTransform
+            waveDatas,              // 用于插值调整（分离）波形
+            waveControllers,        // 用于调用 WaveController.Refresh()
+            papersParentTransform   // 用于插值调整纸片组位置
         );
+
         // 激活 FourierInputController
         fourierInputController.enabled = true;
     }

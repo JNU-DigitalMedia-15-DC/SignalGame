@@ -36,13 +36,12 @@ public class FourierInputController : MonoBehaviour {
     internal void SetDatas(
         WaveData[] waveDatas,
         WaveController[] waveControllers,
-        int wavesCount,
         Transform papersParentTransform
     ) {
         this.waveDatas = waveDatas;
         this.waveControllers = waveControllers;
-        this.waveAttributesCount = wavesCount - 1;
         this.papersParentTransform = papersParentTransform;
+        this.waveAttributesCount = waveControllers.Length - 1;
         waveDataNode = waveDatas[0].GetWaveDataNodePrototype();
     }
 
