@@ -54,12 +54,14 @@ internal class WaveData {
         waveDataMasks[index].Modification.StageWith(modification);
     }
 
-    /// <summary>
-    /// 试验性原型：获取 WaveData 的 第一个WaveDataMask 的 WaveModification
-    /// </summary>
-    /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
-    internal WaveModification GetWaveModificationPrototype() { // TODO
-        return waveDataMasks[0].Modification;
+    /// <summary> 设置 WaveData 的 一个WaveDataMask 的 WaveModification </summary>
+    /// <param name="index"> 要设置哪个 WaveDataMask </param>
+    /// <param name="newWaveModification"> 新的 WaveModification </param>
+    internal void SetWaveModification(
+        int index,
+        WaveModification newWaveModification
+    ) {
+        waveDataMasks[index].Modification.CopyFrom(newWaveModification);
     }
 
     /// <summary>
