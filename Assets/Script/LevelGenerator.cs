@@ -77,12 +77,12 @@ internal class LevelGenerator : MonoBehaviour {
         LevelData levelData = dc.GetCurrentLevelData();
         // 纸片数据
         PaperData paperData = levelData.papersData[0];
-        // 参数组数量
-        int wavesCount = paperData.waveAttributes.Length + 1;
+        // 纸片总数量
+        int papersCount = paperData.waveAttributes.Length + 1;
         // 用户可操作纸片的数据们
-        WaveData[] waveDatas = new WaveData[wavesCount];
+        WaveData[] waveDatas = new WaveData[papersCount];
         // 所有纸片的 WaveController们
-        WaveController[] waveControllers = new WaveController[wavesCount];
+        WaveController[] waveControllers = new WaveController[papersCount];
 
         // 设置纸片组 Holder 的位置（纸片组的左上角）
         papersParentTransform.position = levelData.HolderPosition;
@@ -90,7 +90,7 @@ internal class LevelGenerator : MonoBehaviour {
         // 生成纸片，尚未给予 WaveData
         waveControllers[0] = GetPaper(paperData);
         // 生成子波纸片
-        for (int i = 1; i < wavesCount; ++i) {
+        for (int i = 1; i < papersCount; ++i) {
             waveControllers[i] = Instantiate(waveControllers[0], papersParentTransform);
         }
 
@@ -98,7 +98,7 @@ internal class LevelGenerator : MonoBehaviour {
         waveControllers[0].WaveData = waveDatas[0] =
             new WaveData(paperData.waveAttributes);
         // 配置子波纸片的 WaveData
-        for (int i = 1; i < wavesCount; ++i) {
+        for (int i = 1; i < papersCount; ++i) {
             WaveAttribute[] wa = new WaveAttribute[] { paperData.waveAttributes[i - 1] };
             wa[0].A = 0;
             waveControllers[i].WaveData = waveDatas[i] = new WaveData(wa);
@@ -109,7 +109,7 @@ internal class LevelGenerator : MonoBehaviour {
         fourierInputController.SetDatas(
             waveDatas,
             waveControllers,
-            wavesCount,
+            papersCount,
             papersParentTransform
         );
         // 激活 FourierInputController
