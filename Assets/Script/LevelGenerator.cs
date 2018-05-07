@@ -54,9 +54,10 @@ internal class LevelGenerator : MonoBehaviour {
         //     即：如果关卡只修改 用户可操作纸片们的WaveModification
         //            则至少对和纸片的拷贝级别应该达到 拷贝每个WaveModification
         WaveData goal = new WaveData(sum);
-        // 对目标纸片的第一个蒙版做目标修改
-        // 注：因为用户只操作一个纸片，故只需要对一个 Mask 做修改，约定为第一个
-        goal.ModifyByMask(0, levelData.modification);
+        // 对目标纸片的每个蒙版（每个用户可操作纸片）做目标修改
+        for (int i = 0; i < 2; ++i) {
+            goal.ModifyByMask(i, levelData.modifications[i]);
+        }
         waveControllers[3].WaveData = goal;
 
         // 关卡初始化完成，将数据引用传送给 WaveInputController
