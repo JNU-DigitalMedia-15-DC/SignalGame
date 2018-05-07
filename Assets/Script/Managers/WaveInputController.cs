@@ -17,10 +17,14 @@ public class WaveInputController : MonoBehaviour {
     private Camera mainCamera;
     // 纸片们的边界们的世界坐标，顺序依次为：左右下上
     private float[][] papersBounds = new float[2][];
-    // 所有可以被修改的纸片的 WaveModification
-    private WaveModification[] waveModifications = new WaveModification[2];
+    // 用户对纸片们的修改们（WaveModification们）（初始化为（1，1，0））
+    private WaveModification[] waveModifications = new WaveModification[2] {
+        new WaveModification(), new WaveModification()
+    };
     // 所有可以被修改的纸片的 WaveController
     private WaveController[] waveControllers = new WaveController[4];
+    // 所有可以被修改的纸片的 WaveData
+    private WaveData[] waveDatas = new WaveData[2];
     // 划动开始的位置
     private Vector2 startPos;
     // 是否正在划动（划动是否已经开始）
@@ -29,8 +33,10 @@ public class WaveInputController : MonoBehaviour {
     private bool inDeadZone = true;
     // 要更改的 WaveModification
     private WaveModification waveModification;
+    // 要应用更改的 WaveData
+    private WaveData waveData;
     // 手势操作开始前 WaveModification 的初态
-    private WaveModification waveModificationOrigin;
+    private WaveModification waveModificationOrigin = new WaveModification();
     // 要更改的 WaveController
     private WaveController waveController;
     // 划动是在修改 A 还是 Phi
@@ -45,6 +51,7 @@ public class WaveInputController : MonoBehaviour {
     /// </summary>
     /// <param name="papersData"> 纸片们的源数据 </param>
     /// <param name="waveDatas"> 实例化后纸片们的 waveData </param>
+    /// <param name="waveControllers"> 实例化后纸片们的 WaveController </param>
     internal void SetDatas(
         PaperData[] papersData,
         WaveData[] waveDatas,
@@ -54,9 +61,8 @@ public class WaveInputController : MonoBehaviour {
             // 获取纸片的边界，顺序：左右下上
             papersBounds[i] = waveControllers[i].GetPaperBound();
 
-            // 记录 纸片对应WaveModification
-            waveModifications[i] = waveDatas[i].GetWaveModificationPrototype();
-            // 记录 纸片对应WaveController
+            // 记录纸片对应的 WaveData 和 WaveController
+            this.waveDatas[i] = waveDatas[i];
             this.waveControllers[i] = waveControllers[i];
         }
         for (int i = 2; i < 4; ++i) {
@@ -207,6 +213,10 @@ public class WaveInputController : MonoBehaviour {
 
     // 在改动后刷新被修改的纸片们
     private void RefreshPapers() {
+        // 更新纸片的 WaveModification
+        waveData.SetWaveModification(0, waveModification);
+
+        // 刷新被修改的纸片们
         waveController.Refresh();
         waveControllers[2].Refresh();
         waveControllers[3].Refresh();
@@ -238,10 +248,11 @@ public class WaveInputController : MonoBehaviour {
                         return false;
                 }
 
-                // 设置并拷贝 WaveModification
+                // 记录用户要更改的 WaveModification
                 waveModification = waveModifications[i];
-                waveModificationOrigin = new WaveModification(waveModification);
-                // 设置 WaveControllers
+                waveModificationOrigin.CopyFrom(waveModification);
+                // 记录要应用更改的 WaveData 和 WaveController
+                waveData = waveDatas[i];
                 waveController = waveControllers[i];
 
                 // 返回 true：已找到
