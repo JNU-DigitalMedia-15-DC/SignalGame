@@ -276,7 +276,7 @@ public class FourierInputController : MonoBehaviour {
         // 知道 transform
         // 推的终点
         // 反插值
-        papersParentTransform
+        // papersParentTransform
     }
 
     // // 如果上一帧仍在 deadZone 内而这一帧移出了
