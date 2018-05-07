@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
 
 	
+	//用于处理导引的flag变量
+	public bool isFirstEnter = true;//第一次进入游戏
+	public bool isFirstOpenBookshelf = true;//第一次进入书架
+	public bool isFirstOpenFeedback = true;//第一次打开回馈界面
+	public bool isFirstOpenComputer = true;//第一次打开电脑界面
 
 	private static GameManager instance;  
 	public static GameManager Instance{

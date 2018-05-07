@@ -29,6 +29,7 @@ public class BookShelfManager : MonoBehaviour {
 	//暂时使用代码来加载文字资源，后转为XML
 	//可能要改为图片动态生成
 	static string[] feedbackText = {
+										"暂无来信",
 										"尊敬的**博士：您好，现在德尔小镇的奶牛不再深受噪声影响，产奶量还稳持上升趋势。德尔小镇居民托我们公司向您表示诚挚的谢意和祝福！",
 										"尊敬的**博士：您好，现在我市农村鼠灾面积得到有效的控制并且在农作物逐渐恢复，农民与市长皆大欢喜，市长特此向您表示真切地问候和诚挚的感谢，并授予您“最佳设计奖”！",
 										"尊敬的**博士：您好，经过长达三年的工作时间，您辛苦了。在这三年里，您为我们公司做出了杰出的贡献，为此本公司为你准备了一趟度假旅行，目的地是光闪闪岛屿，其岛屿风光旖旎，柳暗花明，芳草萋萋，绿茵如毡，是放松身心的绝佳选择。希望您假期愉快！"
@@ -81,7 +82,7 @@ public class BookShelfManager : MonoBehaviour {
 	//信件点开初始化文字
 	public void InitiateLetterText()
 	{
-		letterPanel.GetComponentInChildren<Text>().text = feedbackText[0];
+		letterPanel.GetComponentInChildren<Text>().text = feedbackText[limitedIndex-1];
 	}
 	//添加信件选择按钮
 	public void AddLettersButton(NotifyEvent nE)
