@@ -13,7 +13,7 @@ public class FourierInputController : MonoBehaviour {
     // 划动开始的位置
     private float prevX = -10f;
     Transform papersParentTransform;
-    private int prevIntervalId = -1;
+    private int prevIntervalId = 0;
     private WaveData.WaveDataNode waveDataNode;
     // 是否正在划动（划动是否已经开始）
     private bool isSwiping = false;
@@ -29,6 +29,7 @@ public class FourierInputController : MonoBehaviour {
 
     // 区间的左右边界
     private float[] left, right;
+    private bool facingFrequencyDomain = false;
 
     enum OnePointPhase { Unassigned, Began, Ended }
 
@@ -45,6 +46,7 @@ public class FourierInputController : MonoBehaviour {
         waveDataNode = waveDatas[0].GetWaveDataNodePrototype();
     }
 
+    // 预处理区间边界
     private void Awake() {
         left = new float[waveAttributesCount * 2 + 2];
         right = new float[waveAttributesCount * 2 + 2];
@@ -64,6 +66,7 @@ public class FourierInputController : MonoBehaviour {
         right[last] = left[last] + rotateSwipe;
     }
 
+    // 处理输入点
     private void Update() {
         bool isTouching = false;
         Vector2 onePointPos = -Vector2.one;
@@ -101,7 +104,6 @@ public class FourierInputController : MonoBehaviour {
         // 仍在划动
         if (isSwiping && isTouching) {
             Swipe(onePointPos);
-            prevX = onePointPos.x;
         }
 
         // 终止划动
@@ -132,7 +134,8 @@ public class FourierInputController : MonoBehaviour {
 
         int step = diff < 0 ? -1 : 1;
 
-        while (CheckInterval(prevIntervalId + step)) {
+        while (CheckInterval(ref prevIntervalId)) {
+            LerpInterval(prevIntervalId);
             prevIntervalId += step;
         }
 
@@ -152,17 +155,23 @@ public class FourierInputController : MonoBehaviour {
         // }
     }
 
-    private bool CheckInterval(int intervalId) {
+    // 检查区间号是否有效，以及此次划动是否涉及此区间
+    private bool CheckInterval(ref int intervalId) {
+        if (intervalId < 0 || intervalId > waveAttributesCount * 2 + 1) {
+            intervalId = Convert.ToInt32(
+                Mathf.Clamp(intervalId, 0, waveAttributesCount * 2 + 1)
+            );
+            return false;
+        }
+
         if (right[intervalId] < leftSwipeX ||
             rightSwipeX < left[intervalId]) {
             return false;
         }
-
-        LerpInterval(intervalId);
-
         return true;
     }
 
+    // 利用反插值函数处理区间
     private void LerpInterval(int intervalId) {
         float inverseLerp = Mathf.InverseLerp(left[intervalId], right[intervalId], newSwipeX);
         if (intervalId == 0) {
@@ -174,36 +183,47 @@ public class FourierInputController : MonoBehaviour {
             return;
         }
 
-        int waveId = (intervalId - 1) / 2;
-        if (intervalId % 1 == 1) {
-            Subtract(waveId, inverseLerp);
+        int waveAttributeId = (intervalId - 1) / 2;
+        if (intervalId % 2 == 0) {
+            Subtract(waveAttributeId, inverseLerp);
         } else {
-            Push(waveId, inverseLerp);
+            Push(waveAttributeId, inverseLerp);
         }
     }
 
+    // 利用插值函数处理时域与正中之间的旋转
     private void firstRotate(float inverseLerp) {
         papersParentTransform.rotation = Quaternion.identity;
         papersParentTransform.Rotate(Vector3.right * Mathf.Lerp(0f, -30f, inverseLerp));
         papersParentTransform.Rotate(Vector3.up * Mathf.Lerp(0f, 45f, inverseLerp));
     }
 
+    // 利用插值函数处理正中与频域之间的旋转
     private void lastRotate(float inverseLerp) {
         papersParentTransform.rotation = Quaternion.Euler(Vector3.up * 90);
         papersParentTransform.Rotate(Vector3.right * Mathf.Lerp(0f, -30f, 1 - inverseLerp));
         papersParentTransform.Rotate(Vector3.up * Mathf.Lerp(0f, -45f, 1 - inverseLerp));
         if (inverseLerp >.99f) {
             newSwipeX += 1f;
+            facingFrequencyDomain = true;
+        } else {
+            facingFrequencyDomain = false;
         }
     }
 
-    private void Subtract(int waveId, float inverseLerp) {
-        waveDatas[0].GetWaveDataNodePrototype();
-        waveDatas[waveId + 1].GetWaveDataNodePrototype();
+    // 处理将单个正弦波从总波分离出来的情况
+    private void Subtract(int waveAttributeId, float inverseLerp) {
+        // int waveId =
+        // if (inverseLerp < .01f) {
+        //     waveControllers[waveId]
+        // }
+        // waveDatas[0].GetWaveDataNodePrototype();
+        // waveDatas[waveId + 1].GetWaveDataNodePrototype();
     }
 
-    private void Push(int waveId, float inverseLerp) {
-        throw new NotImplementedException();
+    // 处理将单个正弦波纸片向频率更高的位置推进的情况
+    private void Push(int waveAttributeId, float inverseLerp) {
+        // throw new NotImplementedException();
     }
 
     // // 如果上一帧仍在 deadZone 内而这一帧移出了
