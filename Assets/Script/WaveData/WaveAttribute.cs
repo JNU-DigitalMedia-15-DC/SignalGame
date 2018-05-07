@@ -46,7 +46,7 @@ public class WaveModification : WaveAttribute {
     /// </summary>
     /// <param name="other"> 要叠加的 WaveModification </param>
     internal void StageWith(WaveModification other) {
-        A *= other.A;
+        A += other.A;
         Omega *= other.Omega;
         Phi += other.Phi;
     }

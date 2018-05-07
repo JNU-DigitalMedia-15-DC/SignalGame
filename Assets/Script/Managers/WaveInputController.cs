@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using NotificationSystem;
 
@@ -8,11 +10,11 @@ public class WaveInputController : MonoBehaviour {
     // 设备对微小操作的“不响应区域”的大小（半径）
     private const float deadZoneSize = 10f;
     // 对 A 的修改的乘数
-    private const float aZoomSpeed = .05f;
+    private const float aZoomSpeed = .025f;
     // 对 Omega 的修改的乘数
-    private const float mouseScrollSpeed = .1f;
+    private const float mouseScrollSpeed = .025f;
     // 对 Phi 的修改的乘数
-    private const float phiTransSpeed = .1f;
+    private const float phiTransSpeed = .025f;
 
     // 主相机
     private Camera mainCamera;
@@ -244,24 +246,49 @@ public class WaveInputController : MonoBehaviour {
         // Debug.Log("3rd's Modification attribute : "+"A: " + wd.GetWaveModificationPrototype().A + " O: " + wd.GetWaveModificationPrototype().Omega + "P: " + wd.GetWaveModificationPrototype().Phi);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sum">总和纸片的wavecontroller</param>
+    /// <returns></returns>
      private bool CheckUserAnswer(WaveController sum) {
-         bool isPassed;
         WaveModification ans =
             DataController.Instance.GetCurrentLevelData().modification;
         //DataController.Instance.GetCurrentLevelData().papersData[2].
-        WaveModification usr = sum.WaveData.GetWaveModificationPrototype(); // TODO
+        WaveModification usr = sum.WaveData.GetSumWaveModification(); // TODO
         //Debug.Log(usr);
         float[] usrAttributes = { usr.A,usr.Omega,usr.Phi };
         float[] ansAttributes = { ans.A,ans.Omega,ans.Phi };
         float[] ratio = new float[3];
-        //看三个属性的比值是否都大于0.9，如果有一个不大于就返回false即不通过
+
+       
+        //看前两个属性的比值是否都大于0.9，如果有一个不大于就返回false即不通过
+        //后看第三个属性是否是2pi整数倍
         for(int i=0;i<3;i++)
         {
             ratio[i] = Mathf.Abs(usrAttributes[i])/Mathf.Abs(ansAttributes[i]);
-            //Debug.Log(ratio[i]);
-            if(ratio[i]<0.9f) return false;
         }
-        Debug.Log("Ratio A: " + ratio[0] + " Ratio O: " + ratio[1] + "Ratio P: " + ratio[2]);
+        float num = (usrAttributes[2] - ansAttributes[2]) / 2*Mathf.PI;
+        ratio[2] = Mathf.Abs(num - (int)num);
+        Debug.Log("Ratio A: " + ratio[0] + " Ratio O: " + ratio[1] + " Ratio Pi: " + ratio[2]);
+
+        //广播消息，传出数值变动
+        {
+            Dictionary<string,System.Object> dict = new Dictionary<string, System.Object>();
+            //TODO:传关卡总序数进去
+            dict.Add("A",ratio[0]);
+            dict.Add("Omega",ratio[1]);
+            dict.Add("Phi",ratio[2]);
+            NotifyEvent nE = new NotifyEvent(NotifyType.ModificationAlter,this);
+            NotificationCenter.getInstance().postNotification(nE);
+
+        }
+        for(int i=0;i<2;i++)
+        {
+            if(ratio[i]<0.8f || ratio[i]>2f) return false;
+        }
+        if(ratio[2]>0.1f && ratio[2]<0.9f) return false;
+        //if(ratio[2])
         return true;
         
     }

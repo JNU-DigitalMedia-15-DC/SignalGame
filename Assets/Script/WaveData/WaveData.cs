@@ -44,6 +44,11 @@ internal class WaveData {
         foreach (WaveDataMask wdm in waveData.waveDataMasks)
             waveDataMasks.Add(new WaveDataMask(wdm));
     }
+    public void DebugList()
+    {
+        Debug.Log(waveDataMasks[0]);
+        Debug.Log(waveDataMasks[1]);
+    }
 
     /// <summary>
     /// 叠加一个新的 WaveModification 到 WaveData 的 一个 WaveDataMask
@@ -62,6 +67,16 @@ internal class WaveData {
         WaveModification newWaveModification
     ) {
         waveDataMasks[index].Modification.CopyFrom(newWaveModification);
+    }
+    /// <summary>
+    /// 试验性原型：获取 总和纸片wavedata的两个mask总和为modification
+    /// </summary>
+    /// <returns> 总和modification </returns>
+    internal WaveModification GetSumWaveModification(){
+        WaveModification sumModification = new WaveModification();
+        sumModification.StageWith(waveDataMasks[0].Modification);
+        sumModification.StageWith(waveDataMasks[1].Modification);
+        return sumModification;
     }
 
     /// <summary>
