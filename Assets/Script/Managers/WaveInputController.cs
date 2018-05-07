@@ -222,7 +222,11 @@ public class WaveInputController : MonoBehaviour {
         // 更新纸片的 WaveModification
         waveData.SetWaveModification(0, waveModification);
 
-          if(CheckUserAnswer(waveControllers[2]))
+        waveController.Refresh();//被改动的波
+        waveControllers[2].Refresh();//sum波
+        waveControllers[3].Refresh();
+      
+         if(CheckUserAnswer(waveControllers[2]))
         {
             //存在数据处理问题 
             //如果判断成功的一瞬间输入仍然在检测 则会不断加关导致数组越界
@@ -233,17 +237,14 @@ public class WaveInputController : MonoBehaviour {
             inDeadZone = true;
             World.instance.MM.ClearMissions();
             World.instance.MM.DebugNextSubMission();
-            return;
-        }
-        
-        waveController.Refresh();//被改动的波
-        waveControllers[2].Refresh();//sum波
-        waveControllers[3].Refresh();
-      
+            this.enabled = false;
 
-        //Debug.Log(CheckUserAnswer(waveControllers[2]));
-        //WaveData wd = waveControllers[2].WaveData;
-        // Debug.Log("3rd's Modification attribute : "+"A: " + wd.GetWaveModificationPrototype().A + " O: " + wd.GetWaveModificationPrototype().Omega + "P: " + wd.GetWaveModificationPrototype().Phi);
+            //TODO:按逻辑出现过关提示后，按下确认按钮，提示关闭，加载下一关。还要出现提示内容的不同
+        }
+       
+
+            //TODO:加载下一关
+
     }
 
     /// <summary>
@@ -252,45 +253,20 @@ public class WaveInputController : MonoBehaviour {
     /// <param name="sum">总和纸片的wavecontroller</param>
     /// <returns></returns>
      private bool CheckUserAnswer(WaveController sum) {
+         //TODO
+         //两张纸片，分别拿到两个modification
+         //分别做六元组求距离
+         //足够近判断过关
+         //通关的同时
+         //是不是应该把getcurrentleveldata的modification改成数组或者两个modification
+         //usr也应该是两个 waveController[0] wavecontroller[1]
         WaveModification ans =
             DataController.Instance.GetCurrentLevelData().modification;
         //DataController.Instance.GetCurrentLevelData().papersData[2].
         WaveModification usr = sum.WaveData.GetSumWaveModification(); // TODO
         //Debug.Log(usr);
-        float[] usrAttributes = { usr.A,usr.Omega,usr.Phi };
-        float[] ansAttributes = { ans.A,ans.Omega,ans.Phi };
-        float[] ratio = new float[3];
-
-       
-        //看前两个属性的比值是否都大于0.9，如果有一个不大于就返回false即不通过
-        //后看第三个属性是否是2pi整数倍
-        for(int i=0;i<3;i++)
-        {
-            ratio[i] = Mathf.Abs(usrAttributes[i])/Mathf.Abs(ansAttributes[i]);
-        }
-        float num = (usrAttributes[2] - ansAttributes[2]) / 2*Mathf.PI;
-        ratio[2] = Mathf.Abs(num - (int)num);
-        Debug.Log("Ratio A: " + ratio[0] + " Ratio O: " + ratio[1] + " Ratio Pi: " + ratio[2]);
-
-        //广播消息，传出数值变动
-        {
-            Dictionary<string,System.Object> dict = new Dictionary<string, System.Object>();
-            //TODO:传关卡总序数进去
-            dict.Add("A",ratio[0]);
-            dict.Add("Omega",ratio[1]);
-            dict.Add("Phi",ratio[2]);
-            NotifyEvent nE = new NotifyEvent(NotifyType.ModificationAlter,this);
-            NotificationCenter.getInstance().postNotification(nE);
-
-        }
-        for(int i=0;i<2;i++)
-        {
-            if(ratio[i]<0.8f || ratio[i]>2f) return false;
-        }
-        if(ratio[2]>0.1f && ratio[2]<0.9f) return false;
-        //if(ratio[2])
+        float[] hexAttributes = { usr.A,usr.Omega,usr.Phi,ans.A,ans.Omega,ans.Phi };
         return true;
-        
     }
 
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController
