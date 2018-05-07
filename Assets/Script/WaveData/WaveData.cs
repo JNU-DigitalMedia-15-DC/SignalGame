@@ -46,16 +46,16 @@ internal class WaveData {
     }
 
     /// <summary>
-    /// 修改 WaveData 的 第index个 WaveDataMask
+    /// 叠加一个新的 WaveModification 到 WaveData 的 一个 WaveDataMask
     /// </summary>
-    /// <param name="index"> 被改 WaveDataMask 的索引 </param>
-    /// <param name="modification"> 修改量 </param>
+    /// <param name="index"> 要设置的 WaveDataMask </param>
+    /// <param name="modification"> 要叠加的新 WaveModification </param>
     internal void ModifyByMask(int index, WaveModification modification) {
         waveDataMasks[index].Modification.StageWith(modification);
     }
 
     /// <summary> 设置 WaveData 的 一个WaveDataMask 的 WaveModification </summary>
-    /// <param name="index"> 要设置哪个 WaveDataMask </param>
+    /// <param name="index"> 要设置的 WaveDataMask </param>
     /// <param name="newWaveModification"> 新的 WaveModification </param>
     internal void SetWaveModification(
         int index,
