@@ -10,18 +10,26 @@ public class BookShelfManager : MonoBehaviour {
 
 	//书架里有知识点页面，感谢信/照片（反馈）页面以及关卡回顾页面的对象
 	//在这里获得引用
+	[Header("LettersPanel")]
 	public GameObject lettersButtonPrefab;
 	public Transform lettersButtonGroups; 
-	public GameObject letterPanel;
+	public GameObject letterPanel;//信件界面
+	[Header("PhotosPanel")]
+	public Transform photosButtonGroups;
+	public GameObject photoPanel;//照片界面
+	public Sprite[] photos;
 
-	static int pagesIndex = 0;
-	static string[] currentUseContents = null;
-	string[] temp = null;
+	static int pagesIndex = 0;//所使用的翻页序数
+	static string[] currentUseContents = null;//当前使用的用于更新UI的文本数组
+	string[] temp = null;//辅助实现更新翻页的效果
 
 	static int limitedIndex = 1;//根据关卡号来限定当前文字内容数组的访问范围 1->只能访问[0] 2->[0][1] 以此类推
 	
+
 	//暂时使用代码来加载文字资源，后转为XML
+	//可能要改为图片动态生成
 	static string[] feedbackText = {
+										"暂无来信",
 										"尊敬的**博士：您好，现在德尔小镇的奶牛不再深受噪声影响，产奶量还稳持上升趋势。德尔小镇居民托我们公司向您表示诚挚的谢意和祝福！",
 										"尊敬的**博士：您好，现在我市农村鼠灾面积得到有效的控制并且在农作物逐渐恢复，农民与市长皆大欢喜，市长特此向您表示真切地问候和诚挚的感谢，并授予您“最佳设计奖”！",
 										"尊敬的**博士：您好，经过长达三年的工作时间，您辛苦了。在这三年里，您为我们公司做出了杰出的贡献，为此本公司为你准备了一趟度假旅行，目的地是光闪闪岛屿，其岛屿风光旖旎，柳暗花明，芳草萋萋，绿茵如毡，是放松身心的绝佳选择。希望您假期愉快！"
@@ -44,10 +52,11 @@ public class BookShelfManager : MonoBehaviour {
 	 void Awake() {
 		NotificationCenter.getInstance ().AddNotification (NotifyType.Main_Mission_Passed, null);
 		NotificationCenter.getInstance ().registerObserver (NotifyType.Main_Mission_Passed, AddLettersButton);
+		NotificationCenter.getInstance ().registerObserver (NotifyType.Main_Mission_Passed, AddPhotosButton);
 		NotificationCenter.getInstance ().registerObserver (NotifyType.Main_Mission_Passed, LimitedIndexUpdate);
 	}
 
-
+	//根据关卡号来限定当前文字内容数组的访问范围
 	void LimitedIndexUpdate(NotifyEvent nE)
 	{
 		limitedIndex = nE.Params["MainIndex"];
@@ -70,7 +79,12 @@ public class BookShelfManager : MonoBehaviour {
 
 
 	//反馈页面操作，要根据关卡属性
-	//添加感谢信按钮
+	//信件点开初始化文字
+	public void InitiateLetterText()
+	{
+		letterPanel.GetComponentInChildren<Text>().text = feedbackText[limitedIndex-1];
+	}
+	//添加信件选择按钮
 	public void AddLettersButton(NotifyEvent nE)
 	{
 		//在panel添加按钮 按钮调用ui移动并显示指定feedback文字
@@ -79,10 +93,28 @@ public class BookShelfManager : MonoBehaviour {
 		nLB.GetComponentInChildren<Text>().text = "new Feedback";
 		nLB.GetComponent<Button>().onClick.AddListener( ()=> {letterPanel.GetComponentInChildren<Text>().text = feedbackText[nE.Params["MainIndex"]-1];});
 	}
+
+	//照片点开初始化内容
+	public void InitiatePhotosContent()
+	{
+		if(limitedIndex == 1)
+		photoPanel.GetComponentInChildren<Image>().sprite = photos[0];
+		else photoPanel.GetComponentInChildren<Image>().sprite = photos[1];
+	}
+	public void AddPhotosButton(NotifyEvent nE)
+	{
+		GameObject nLB = Instantiate(lettersButtonPrefab);
+		nLB.transform.SetParent(photosButtonGroups);
+		nLB.GetComponentInChildren<Text>().text = "new Photo";
+		nLB.GetComponent<Button>().onClick.AddListener( ()=> {photoPanel.GetComponentInChildren<Image>().sprite = photos[nE.Params["MainIndex"]-1];});
+	}
+
+
 	//添加
 	//要更新的文字数组，按序数更新
 	//从页面左侧开始计数 1/2 3/4 5/6
-	
+
+	///<summary>用数字设置当前使用的文本数组</summary>
 	public void SetCurrentUse(int classIndex)
 	{
 		switch(classIndex)
@@ -94,6 +126,7 @@ public class BookShelfManager : MonoBehaviour {
 		
 	} 
 
+	///<summary>模拟页数更新内容</summary>
 	public void UpdateContents(GameObject pages)
 	{
 		Text f,s;
@@ -115,6 +148,7 @@ public class BookShelfManager : MonoBehaviour {
 		s.text = temp[pagesIndex+1];
 		
 	}
+
 	public void ClearContents(GameObject pages)
 	{
 		//获取到左右页面的文字组件，清除文字
@@ -123,6 +157,8 @@ public class BookShelfManager : MonoBehaviour {
 		pagesIndex = 0;//序号清零
 	}
 
+
+	//往后翻以及往前翻
 	public void PageIndexPlus()
 	{
 		if(pagesIndex+2 >= temp.Length)

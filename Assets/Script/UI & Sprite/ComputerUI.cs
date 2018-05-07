@@ -15,7 +15,7 @@ public class ComputerUI : UIFade
     {
         base.ResetRT();
         //World.instance.CM.UpdateDescription();
-        World.instance.CM.ShowDescription();
+        World.instance.CM.InitiateEmail();
     }
 
 

@@ -11,33 +11,61 @@ public class ComputerManager : MonoBehaviour {
 	public Text description;
 	
 
-	public string[] MissionDescription;
+	public string[] MissionDescription = new string[3];//公变存储所有要用的文字
 	private string currentDescription;
+	private string[] currentEmailDescriptions = new string[3];//当前可用的文本数组
+
+	private int emailPageIndex = 0;
 	// Use this for initialization
 
 	void Awake()
 	{
-		currentDescription = MissionDescription[0];
 		NotificationCenter.getInstance ().AddNotification (NotifyType.Main_Mission_Passed, null);
 		NotificationCenter.getInstance ().registerObserver (NotifyType.Main_Mission_Passed, UpdateDescription);
 	}
 	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		currentEmailDescriptions[0] = MissionDescription[0];
 	}
 
+
+	/// <summary>
+	/// 打开电脑界面时自动切到当前主管卡序数对应的文本
+	/// </summary>
+	public void InitiateEmail()
+	{
+		description.text = currentEmailDescriptions[GameManager.Instance.currentMainIndex-1];
+		emailPageIndex = GameManager.Instance.currentMainIndex-1;
+	}
+	
+	public void NextEmail()
+	{
+		if(emailPageIndex == currentEmailDescriptions.Length || emailPageIndex>=GameManager.Instance.currentMainIndex-1)
+		return;
+		else emailPageIndex++;
+		ShowDescription();
+	}
+	public void LastEmail()
+	{
+		if(emailPageIndex == 0)
+			return;
+		else emailPageIndex--;
+		ShowDescription();
+	}
+	/// <summary>
+	/// 将预置文本数组中的特定内容赋给当前可使用的文本数组内容
+	/// </summary>
+	/// <param name="nE"> 消息事件</param>
 	public void UpdateDescription(NotifyEvent nE)
 	{
-		currentDescription = MissionDescription[ nE.Params["MainIndex"]-1 ];
+		currentEmailDescriptions[ nE.Params["MainIndex"]-1 ] = MissionDescription[ nE.Params["MainIndex"]-1 ];
 	}
 
 	public void ShowDescription()
 	{
-		description.text = currentDescription; 
+		description.text = currentEmailDescriptions[emailPageIndex]; 
+		Debug.Log(currentEmailDescriptions[0]);
+		Debug.Log(currentEmailDescriptions[1]);
+		Debug.Log(currentEmailDescriptions[2]);
 	}
 
 	public void ClearDescription()
