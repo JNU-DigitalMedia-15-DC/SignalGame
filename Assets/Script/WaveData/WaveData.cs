@@ -44,11 +44,6 @@ internal class WaveData {
         foreach (WaveDataMask wdm in waveData.waveDataMasks)
             waveDataMasks.Add(new WaveDataMask(wdm));
     }
-    public void DebugList()
-    {
-        Debug.Log(waveDataMasks[0]);
-        Debug.Log(waveDataMasks[1]);
-    }
 
     /// <summary>
     /// 叠加一个新的 WaveModification 到 WaveData 的 一个 WaveDataMask
