@@ -253,6 +253,7 @@ public class WaveInputController : MonoBehaviour {
     /// <param name="sum">总和纸片的wavecontroller</param>
     /// <returns></returns>
      private bool CheckUserAnswer(WaveController sum) {
+         /*
          //TODO
          //两张纸片，分别拿到两个modification
          //分别做六元组求距离
@@ -262,11 +263,14 @@ public class WaveInputController : MonoBehaviour {
          //usr也应该是两个 waveController[0] wavecontroller[1]
         WaveModification ans =
             DataController.Instance.GetCurrentLevelData().modification;
+
         //DataController.Instance.GetCurrentLevelData().papersData[2].
         WaveModification usr = sum.WaveData.GetSumWaveModification(); // TODO
         //Debug.Log(usr);
         float[] hexAttributes = { usr.A,usr.Omega,usr.Phi,ans.A,ans.Omega,ans.Phi };
-        return true;
+        return true; */
+
+        return false;
     }
 
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController

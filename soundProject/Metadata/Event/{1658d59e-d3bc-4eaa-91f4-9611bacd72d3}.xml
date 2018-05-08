@@ -446,7 +446,7 @@
             <value>57.643763547203775</value>
         </property>
         <property name="length">
-            <value>104.2839472961697</value>
+            <value>543.80201958532632</value>
         </property>
         <property name="color">
             <value>Magenta</value>
@@ -474,7 +474,7 @@
     </object>
     <object class="SingleSound" id="{ed039ac1-4dfd-4656-af5d-20eb602ae581}">
         <property name="start">
-            <value>161.92771084337349</value>
+            <value>601.4457831325301</value>
         </property>
         <property name="length">
             <value>1445.7831325301206</value>
@@ -610,7 +610,7 @@
             <value>57.831325301204821</value>
         </property>
         <property name="length">
-            <value>104.09638554216866</value>
+            <value>543.61445783132524</value>
         </property>
         <relationship name="triggerConditions">
             <destination>{847b8986-de59-43b7-a2e1-3687b72b1747}</destination>
@@ -627,7 +627,7 @@
     </object>
     <object class="NamedMarker" id="{9126e032-a8a8-4423-aaf8-f728c7f53c2c}">
         <property name="position">
-            <value>161.92771084337349</value>
+            <value>601.4457831325301</value>
         </property>
         <property name="name">
             <value>Victory</value>
@@ -636,7 +636,7 @@
             <destination>{ec9d88b8-45fe-4649-9056-ff207326cb23}</destination>
         </relationship>
         <relationship name="markerTrack">
-            <destination>{f4006fa6-3048-4661-98f2-1a857f582e7f}</destination>
+            <destination>{16a6f2a8-74b9-4fb4-ae02-5838ec8bce1f}</destination>
         </relationship>
     </object>
     <object class="TransitionRegion" id="{e45a90d4-d405-4760-a6e2-df925bd8bde9}">
@@ -644,7 +644,7 @@
             <value>0</value>
         </property>
         <property name="length">
-            <value>161.92771084337346</value>
+            <value>601.4457831325301</value>
         </property>
         <relationship name="triggerConditions">
             <destination>{5e81e27f-9d1f-46e7-af1b-3043905e7c19}</destination>
@@ -661,7 +661,7 @@
     </object>
     <object class="TransitionRegion" id="{9b6c4087-9e26-49ef-af21-6aebcd22c880}">
         <property name="position">
-            <value>161.92771084337349</value>
+            <value>601.4457831325301</value>
         </property>
         <property name="length">
             <value>581.20481927710841</value>
@@ -676,7 +676,7 @@
             <destination>{ec9d88b8-45fe-4649-9056-ff207326cb23}</destination>
         </relationship>
         <relationship name="markerTrack">
-            <destination>{ba31110c-7a57-4394-82e0-7ddbed1274be}</destination>
+            <destination>{3e7363b2-f8e2-4796-b1f2-5f5b32a964a2}</destination>
         </relationship>
     </object>
     <object class="MixerBusEffectChain" id="{7a3814cb-334e-4160-8194-2cd941d13052}">
