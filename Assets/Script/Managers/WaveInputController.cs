@@ -21,11 +21,17 @@ public class WaveInputController : MonoBehaviour {
     // 纸片们的边界们的世界坐标，顺序依次为：左右下上
     private float[][] papersBounds = new float[2][];
     // 用户对纸片们的修改们（WaveModification们）（初始化为（1，1，0））
+<<<<<<< HEAD
     private WaveModification[] usrWaveModifications = new WaveModification[2] {
         new WaveModification(), new WaveModification()
     };
     //TODO
     private WaveModification[] ansWaveModifications = new WaveModification[2];
+=======
+    private WaveModification[] waveModifications = new WaveModification[2] {
+        new WaveModification(), new WaveModification()
+    };
+>>>>>>> Landy/paper rebase (#11)
     // 所有可以被修改的纸片的 WaveController
     private WaveController[] waveControllers = new WaveController[4];
     // 所有可以被修改的纸片的 WaveData
@@ -61,8 +67,12 @@ public class WaveInputController : MonoBehaviour {
     internal void SetDatas(
         PaperData[] papersData,
         WaveData[] waveDatas,
+<<<<<<< HEAD
         WaveController[] waveControllers,
         WaveModification[] ansWaveModifications
+=======
+        WaveController[] waveControllers
+>>>>>>> Landy/paper rebase (#11)
     ) {
         for (int i = 0; i < 2; ++i) {
             // 获取纸片的边界，顺序：左右下上
@@ -71,7 +81,10 @@ public class WaveInputController : MonoBehaviour {
             // 记录纸片对应的 WaveData 和 WaveController
             this.waveDatas[i] = waveDatas[i];
             this.waveControllers[i] = waveControllers[i];
+<<<<<<< HEAD
             this.ansWaveModifications[i] = ansWaveModifications[i];
+=======
+>>>>>>> Landy/paper rebase (#11)
         }
         for (int i = 2; i < 4; ++i) {
             // 继续记录 纸片对应WaveController
@@ -229,17 +242,38 @@ public class WaveInputController : MonoBehaviour {
         waveController.Refresh();//被改动的波
         waveControllers[2].Refresh();//sum波
         waveControllers[3].Refresh();
+<<<<<<< HEAD
 
          if(CheckUserAnswer(waveControllers[2]))
         {
+=======
+      
+         if(CheckUserAnswer(waveControllers[2]))
+        {
+            //存在数据处理问题 
+            //如果判断成功的一瞬间输入仍然在检测 则会不断加关导致数组越界
+            //进入某ui后 点选确定下关 再初始化纸片
+>>>>>>> Landy/paper rebase (#11)
             isPinching = false;
             isSwiping = false;
             isChangingANotPhi = true;
             inDeadZone = true;
+<<<<<<< HEAD
             World.instance.MM.PassMission();
             this.enabled = false;
             //TODO:按逻辑出现过关提示后，按下确认按钮，提示关闭，加载下一关。还要出现提示内容的不同
         }
+=======
+            World.instance.MM.ClearMissions();
+            World.instance.MM.DebugNextSubMission();
+            this.enabled = false;
+
+            //TODO:按逻辑出现过关提示后，按下确认按钮，提示关闭，加载下一关。还要出现提示内容的不同
+        }
+       
+
+            //TODO:加载下一关
+>>>>>>> Landy/paper rebase (#11)
 
     }
 
@@ -249,13 +283,18 @@ public class WaveInputController : MonoBehaviour {
     /// <param name="sum">总和纸片的wavecontroller</param>
     /// <returns></returns>
      private bool CheckUserAnswer(WaveController sum) {
+<<<<<<< HEAD
          
+=======
+         //TODO
+>>>>>>> Landy/paper rebase (#11)
          //两张纸片，分别拿到两个modification
          //分别做六元组求距离
          //足够近判断过关
          //通关的同时
          //是不是应该把getcurrentleveldata的modification改成数组或者两个modification
          //usr也应该是两个 waveController[0] wavecontroller[1]
+<<<<<<< HEAD
          //TODO：给六元组赋值
         float[,] hexAttributes = new float[2,6];
         for(int i=0;i<2;i++)
@@ -288,6 +327,17 @@ public class WaveInputController : MonoBehaviour {
         World.instance.MM.PassMission();
         this.enabled = false;
     }
+=======
+        WaveModification ans =
+            DataController.Instance.GetCurrentLevelData().modification;
+        //DataController.Instance.GetCurrentLevelData().papersData[2].
+        WaveModification usr = sum.WaveData.GetSumWaveModification(); // TODO
+        //Debug.Log(usr);
+        float[] hexAttributes = { usr.A,usr.Omega,usr.Phi,ans.A,ans.Omega,ans.Phi };
+        return true;
+    }
+
+>>>>>>> Landy/paper rebase (#11)
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController
     private bool FindWaveRefByScreenPos(
         Vector2 screenPointOne,
@@ -315,7 +365,11 @@ public class WaveInputController : MonoBehaviour {
                 }
 
                 // 记录用户要更改的 WaveModification
+<<<<<<< HEAD
                 waveModification = usrWaveModifications[i];
+=======
+                waveModification = waveModifications[i];
+>>>>>>> Landy/paper rebase (#11)
                 waveModificationOrigin.CopyFrom(waveModification);
                 // 记录要应用更改的 WaveData 和 WaveController
                 waveData = waveDatas[i];
