@@ -9,9 +9,11 @@ public class FourierInputController : MonoBehaviour {
     private const float subtractSwipe = 200f;
     /// <summary> 完成“波形推进”操作需要的横向滑动总量 </summary>
     private const float pushSwipe = 200f;
+    private const float EQSpeed = .001f;
+    private const float maxEQ = 1.25f;
 
     /// <summary> deadZone半径（设备对微小操作的“不响应区域”的大小）） </summary>
-    private const float deadZoneSize = 10f;
+    private const float deadZoneSize = 50f;
     /// <summary> 频域图的频率最大值 </summary>
     private const float maxOmega = 10f;
     /// <summary> z轴推进量的最大值 </summary>
@@ -28,6 +30,7 @@ public class FourierInputController : MonoBehaviour {
     private bool isSwiping = false;
     /// <summary> 划动是否仍在 deadZone 范畴内 </summary>
     private bool inDeadZone = true;
+    private bool isChangingEQ = false;
     /// <summary> 上一帧结束时，用户的横向滑动量累和 </summary>
     private float totalSwipeX = 0f;
     /// <summary> 这一帧开始时，用户的横向滑动量累和 </summary>
@@ -53,6 +56,7 @@ public class FourierInputController : MonoBehaviour {
     private Transform[] paperTransforms;
     /// <summary> 纸片们的 WaveData们 </summary>
     private WaveData[] waveDatas;
+    private float[] originWaveA;
 
     /// <summary> 操作区间的左右边界 </summary>
     private float[] left, right;
@@ -60,6 +64,8 @@ public class FourierInputController : MonoBehaviour {
     int intervalsCount;
     /// <summary> 摄像机是否已经正对频域（是否已经可以进行滤波操作） </summary>
     private bool facingFrequencyDomain = false;
+    private float[] EQ = new float[] { 1, 1, 1 };
+    private Vector2 startInputPos;
 
     /// <summary> 某个设备输入的输入阶段（刚刚开始，刚刚结束） </summary>
     enum InputPhase { Unassigned, Began, Ended }
@@ -78,8 +84,13 @@ public class FourierInputController : MonoBehaviour {
         Transform papersParentTransform
     ) {
         this.waveAttributes = waveAttributes;
-        destinationZ = new float[waveAttributes.Length];
+        originWaveA = new float[waveAttributes.Length];
         int i = 0;
+        foreach (var wa in waveAttributes) {
+            originWaveA[i++] = wa.A;
+        }
+        destinationZ = new float[waveAttributes.Length];
+        i = 0;
         foreach (WaveAttribute waveAttribute in waveAttributes) {
             destinationZ[i++] = Mathf.Lerp(0, maxZ,
                 InverseLerpClamped(0, maxOmega,
@@ -163,7 +174,7 @@ public class FourierInputController : MonoBehaviour {
 
         // 仍在划动
         if (isSwiping) {
-            Swipe(prevInputPos, firstInputPos);
+            Swipe(startInputPos, prevInputPos, firstInputPos);
             prevInputPos = firstInputPos;
         }
 
@@ -177,6 +188,7 @@ public class FourierInputController : MonoBehaviour {
 
         // 开始划动
         if (firstInputPhase == InputPhase.Began) {
+            startInputPos = firstInputPos;
             prevInputPos = firstInputPos;
             isSwiping = true;
             inDeadZone = true;
@@ -184,30 +196,66 @@ public class FourierInputController : MonoBehaviour {
     }
 
     /// <summary> 处理划动操作 </summary>
+    /// <param name="startInputPos"> 划动开始时的输入点位置 </param>
     /// <param name="prevInputPos"> 上一帧结束时输入点的位置 </param>
     /// <param name="inputPos"> 这一帧开始时输入点的位置 </param>
-    private void Swipe(Vector2 prevInputPos, Vector2 inputPos) {
-        /// <summary> 划动总位移的横坐标 </summary>
-        float deltaX = -(inputPos.x - prevInputPos.x);
+    private void Swipe(Vector2 startInputPos, Vector2 prevInputPos, Vector2 inputPos) {
+        // 计算划动总位移矢量
+        Vector2 diff = inputPos - startInputPos;
+        // 如果已经正对频域……
+        if (facingFrequencyDomain) {
+            // 如果上一帧仍在 deadZone 内而这一帧移出了
+            if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
+                // 判断是调的是否为EQ
+                isChangingEQ = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
 
-        // 更新各个**SwipeX
-        newSwipeX = Mathf.Clamp(totalSwipeX + deltaX, -1f, rightLast + 1f);
-        leftSwipeX = Mathf.Min(totalSwipeX, newSwipeX);
-        rightSwipeX = Mathf.Max(totalSwipeX, newSwipeX);
-        Debug.Log(newSwipeX);
+                // 标记此次 touch 已经脱离 deadZone
+                inDeadZone = false;
+            }
 
-        /// <summary> 是否在向左划动 </summary>
-        bool isSwipingLeft = deltaX < 0;
+            // 如果已经不在 deadZone 内
+            if (!inDeadZone) {
+                // 是否在修改EQ
+                if (isChangingEQ) {
+                    int EQId = System.Convert.ToInt32(Mathf.Floor(startInputPos.x * 3 / Screen.width));
+                    float deltaY = inputPos.y - prevInputPos.y;
+                    EQ[EQId] = Mathf.Clamp(EQ[EQId] + deltaY * EQSpeed, 0, maxEQ);
+                    Debug.Log(EQ[EQId]);
 
-        // 处理划动此次划动涉及的所有操作区间
-        do {
-            // 利用反插值函数处理prevIntervalId所示操作区间
-            LerpInterval(prevIntervalId, newSwipeX);
-            // 尝试步进区间index，如果成功进入新操作区间，继续循环
-        } while (AdvanceInterval(ref prevIntervalId, isSwipingLeft));
+                    int right = System.Convert.ToInt32(
+                        (EQId + 1) * waveAttributesCount / 3f
+                    );
+                    for (int i = System.Convert.ToInt32(EQId * waveAttributesCount / 3f); i < right; ++i) {
+                        waveAttributes[i].A = originWaveA[i] * EQ[EQId];
+                        waveControllers[i + 1].Refresh();
+                    }
+                }
+            }
+        }
 
-        // 划动处理结束，更新 totalSwipeX
-        totalSwipeX = newSwipeX;
+        // if (!facingFrequencyDomain || (!inDeadZone && !isChangingEQ)) {
+        if (!(facingFrequencyDomain && (inDeadZone || isChangingEQ))) {
+            /// <summary> 两帧间划动位移的横坐标 </summary>
+            float deltaX = -(inputPos.x - prevInputPos.x);
+
+            // 更新各个**SwipeX
+            newSwipeX = Mathf.Clamp(totalSwipeX + deltaX, -1f, rightLast + 1f);
+            leftSwipeX = Mathf.Min(totalSwipeX, newSwipeX);
+            rightSwipeX = Mathf.Max(totalSwipeX, newSwipeX);
+
+            /// <summary> 是否在向左划动 </summary>
+            bool isSwipingLeft = deltaX < 0;
+
+            // 处理划动此次划动涉及的所有操作区间
+            do {
+                // 利用反插值函数处理prevIntervalId所示操作区间
+                LerpInterval(prevIntervalId, newSwipeX);
+                // 尝试步进区间index，如果成功进入新操作区间，继续循环
+            } while (AdvanceInterval(ref prevIntervalId, isSwipingLeft));
+
+            // 划动处理结束，更新 totalSwipeX
+            totalSwipeX = newSwipeX;
+        }
     }
 
     /// <summary>
@@ -289,13 +337,12 @@ public class FourierInputController : MonoBehaviour {
     private void lastRotate(float inverseLerp) { // TODO
         // 如果从正中视角切换到正对频域视角……
         if (facingFrequencyDomain == false && inverseLerp >.99f) {
-            // 帮用户彻底转过去
-            // newSwipeX += 1f; // TODO
             inverseLerp = 1f;
             // 标记为已经正对频域
             facingFrequencyDomain = true;
             // 将总纸片设置为未激活
             papers[0].SetActive(false);
+            isSwiping = false;
         }
         // 如果从正对频域视角切换到正中视角
         if (facingFrequencyDomain == true && inverseLerp < .9f) {
@@ -339,27 +386,4 @@ public class FourierInputController : MonoBehaviour {
         int paperId = waveAttributeId + 1;
         paperTransforms[paperId].localPosition = Vector3.forward * z;
     }
-
-    // // 如果上一帧仍在 deadZone 内而这一帧移出了
-    // if (inDeadZone && diff.magnitude > deadZoneSize / 2) {
-    //     // 判断此次划动是在修改 A 还是 Phi
-    //     isChangingANotPhi = Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
-
-    //     // 标记此次 touch 已经脱离 deadZone
-    //     inDeadZone = false;
-    // }
-
-    // // 如果已经不在 deadZone 内
-    // if (!inDeadZone) {
-    //     // 要修改 A 还是 Phi
-    //     if (isChangingANotPhi) {
-    //         waveModification.A = waveModificationOrigin.A *
-    //             (diff.y * aZoomSpeed + 1);
-    //     } else {
-    //         waveModification.Phi = waveModificationOrigin.Phi +
-    //             diff.x * phiTransSpeed;
-    //     }
-    //     // 立刻刷新纸片上波形
-    //     RefreshPapers();
-    // }
 }
