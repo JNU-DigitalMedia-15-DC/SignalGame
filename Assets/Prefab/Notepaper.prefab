@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 114816128452748142}
   m_Layer: 0
   m_Name: Notepaper
-  m_TagString: paper
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -111,8 +111,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 964a34ce4e6eb244f9dc36828e75c2e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 120019777486310606}
   paperTransform: {fileID: 4442980340994378}
+  lineRenderer: {fileID: 120019777486310606}
+  deltaX: 0.02
 --- !u!120 &120019777486310606
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -148,7 +149,7 @@ LineRenderer:
   m_Positions: []
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 0.025
+    widthMultiplier: 0.01
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -163,8 +164,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.8088235, g: 0.49956748, b: 0.49956748, a: 1}
-      key1: {r: 0.8088235, g: 0.49956748, b: 0.49956748, a: 1}
+      key0: {r: 1, g: 0, b: 1, a: 1}
+      key1: {r: 1, g: 0, b: 1, a: 1}
       key2: {r: 1, g: 0, b: 0.84827566, a: 0}
       key3: {r: 1, g: 0, b: 0.84827566, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
