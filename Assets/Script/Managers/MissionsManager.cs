@@ -57,6 +57,7 @@ public class MissionsManager : MonoBehaviour {
 	public void PassMission()
 	{
 		missionsPassUi.SetActive(true);
+		World.instance.AM.setWinTrue();
 	}
 	//初始化关卡 
 	public void InitializeMissions()

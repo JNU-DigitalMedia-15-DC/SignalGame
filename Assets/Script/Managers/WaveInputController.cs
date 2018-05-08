@@ -229,8 +229,8 @@ public class WaveInputController : MonoBehaviour {
         waveController.Refresh();//被改动的波
         waveControllers[2].Refresh();//sum波
         waveControllers[3].Refresh();
-
-         if(CheckUserAnswer(waveControllers[2]))
+        World.instance.AM.DebugSetWaveAmp(usrWaveModifications[0].A,usrWaveModifications[1].A);
+        /* if(CheckUserAnswer(waveControllers[2]))
         {
             isPinching = false;
             isSwiping = false;
@@ -239,7 +239,7 @@ public class WaveInputController : MonoBehaviour {
             World.instance.MM.PassMission();
             this.enabled = false;
             //TODO:按逻辑出现过关提示后，按下确认按钮，提示关闭，加载下一关。还要出现提示内容的不同
-        }
+        }*/
 
     }
 
@@ -279,6 +279,7 @@ public class WaveInputController : MonoBehaviour {
         Debug.Log("distance 1: " + distance[0] + " distance 2:" + distance[1] );
         return false;
     }
+
     public void DebugPass()
     {
         isPinching = false;
