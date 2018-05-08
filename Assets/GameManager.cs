@@ -39,4 +39,9 @@ public class GameManager : MonoBehaviour {
 		get{ return currentSubIndex; }
 		set{ currentSubIndex = value; } 
 	}
+
+	public int GetTotalMissionIndex()
+	{
+		return prefix[currentMainIndex-1]+currentSubIndex;
+	}
 }

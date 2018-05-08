@@ -5,7 +5,7 @@ using NotificationSystem;
 
 public class MissionsManager : MonoBehaviour {
 
-
+	public GameObject missionsPassUi;
 
 	//下一主关
 	public void DebugNextMainMission()
@@ -54,9 +54,9 @@ public class MissionsManager : MonoBehaviour {
 	}
 
 
-	public void UpdateManagersInfo()
+	public void PassMission()
 	{
-		
+		missionsPassUi.SetActive(true);
 	}
 	//初始化关卡 
 	public void InitializeMissions()
@@ -69,12 +69,11 @@ public class MissionsManager : MonoBehaviour {
 		NotificationCenter.getInstance().postNotification(nEvent);
 	}
 
-	//清空关卡 
+	/// <summary>
+	/// 清空关卡，用tag搜索场景物体消除
+	/// </summary>
 	public void ClearMissions()
 	{
-		/*NotifyEvent nEvent = new NotifyEvent(NotifyType.ClearMission,this.gameObject);
-		Debug.Log("I");
-		NotificationCenter.getInstance().postNotification(nEvent);*/
 		GameObject[] papers = GameObject.FindGameObjectsWithTag("paper");
 		foreach(GameObject go in papers)
 		Destroy(go);

@@ -232,22 +232,14 @@ public class WaveInputController : MonoBehaviour {
 
          if(CheckUserAnswer(waveControllers[2]))
         {
-            //存在数据处理问题 
-            //如果判断成功的一瞬间输入仍然在检测 则会不断加关导致数组越界
-            //进入某ui后 点选确定下关 再初始化纸片
             isPinching = false;
             isSwiping = false;
             isChangingANotPhi = true;
             inDeadZone = true;
-            World.instance.MM.ClearMissions();
-            World.instance.MM.DebugNextSubMission();
+            World.instance.MM.PassMission();
             this.enabled = false;
-
             //TODO:按逻辑出现过关提示后，按下确认按钮，提示关闭，加载下一关。还要出现提示内容的不同
         }
-       
-
-            //TODO:加载下一关
 
     }
 
@@ -293,8 +285,7 @@ public class WaveInputController : MonoBehaviour {
         isSwiping = false;
         isChangingANotPhi = true;
         inDeadZone = true;
-        World.instance.MM.ClearMissions();
-        World.instance.MM.DebugNextSubMission();
+        World.instance.MM.PassMission();
         this.enabled = false;
     }
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController

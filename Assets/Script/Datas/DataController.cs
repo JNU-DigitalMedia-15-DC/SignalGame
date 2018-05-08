@@ -33,7 +33,7 @@ public class DataController : MonoBehaviour {
     public LevelData GetCurrentLevelData() {
         // If we wanted to return different rounds, we could do that here
         // We could store an int representing the current round index in PlayerProgress
-        return allLevelData[0]; // TODO
+        return allLevelData[GameManager.Instance.GetTotalMissionIndex()-1]; // TODO
     }
 
 
