@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 
-// WaveController 脚本需要其 GameObject 拥有一个 LineRenderer 组件
-[RequireComponent(typeof(LineRenderer))]
 /// <summary>
 /// WaveController 脚本用于控制其 GameObject 的 LineRenderer 中点的数据
 /// </summary>
