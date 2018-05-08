@@ -7,11 +7,17 @@ internal class WaveData {
     /// <summary> 波形数据的蒙版的列表 </summary>
     private List<WaveDataMask> waveDataMasks;
 
+    /// <summary> 默认构造函数 </summary>
+    internal WaveData() {
+        // 只有一个空的 waveDataMasks列表
+        waveDataMasks = new List<WaveDataMask>();
+    }
+
     /// <summary>
     /// 由 多个WaveAttribute 生成新 WaveData
     /// </summary>
     /// <param name="waveAttributeList"> WaveAttribute 的数组 </param>
-    internal WaveData(WaveAttribute[] waveAttributeList) {
+    internal WaveData(IEnumerable<WaveAttribute> waveAttributeList) {
         // 初始化蒙版
         waveDataMasks = new List<WaveDataMask> { new WaveDataMask() };
 
@@ -46,7 +52,7 @@ internal class WaveData {
     }
 
     /// <summary>
-    /// 叠加一个新的 WaveModification 到 WaveData 的 一个 WaveDataMask
+    /// 叠加一个 WaveModification 到 WaveData 的 一个 WaveDataMask
     /// </summary>
     /// <param name="index"> 要设置的 WaveDataMask </param>
     /// <param name="modification"> 要叠加的新 WaveModification </param>
@@ -75,22 +81,6 @@ internal class WaveData {
     }
 
     /// <summary>
-    /// 试验性原型：获取 WaveData 的 第一个 WaveAttribute
-    /// </summary>
-    /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
-    internal WaveDataNode GetWaveDataNodePrototype() { // TODO
-        return waveDataMasks[0].First;
-    }
-
-    /// <summary>
-    /// 试验性原型：获取 WaveData 的 第一个 WaveAttribute
-    /// </summary>
-    /// <returns> WaveData 的 第一个WaveDataMask 的 WaveModification </returns>
-    internal WaveAttribute GetWaveAttributePrototype() { // TODO
-        return waveDataMasks[0].First.Value;
-    }
-
-    /// <summary>
     /// 获取波在横坐标为 x 时的函数值
     /// </summary>
     /// <param name="x"> 求值用到的横坐标 x </param>
@@ -109,7 +99,7 @@ internal class WaveData {
     }
 
     /// <summary> 覆盖并影响连续一串波参数三元组的蒙版 </summary>
-    internal class WaveDataMask : IEnumerable<WaveAttribute> { // TODO
+    internal class WaveDataMask : IEnumerable<WaveAttribute> {
         /// <summary> 蒙版所属波参数节点之首 </summary>
         internal WaveDataNode First;
         /// <summary> 蒙版所属波参数节点之尾 </summary>
@@ -117,7 +107,7 @@ internal class WaveData {
         /// <summary> 蒙版所记录的对其下所有波参数的修改 </summary>
         internal WaveModification Modification;
 
-        /// <summary> 默认构造函数 </summary>
+        /// <summary> 默认构造函数，内部没有节点，修改量为幺元 </summary>
         internal WaveDataMask() { Modification = new WaveModification(); }
 
         /// <summary>
@@ -183,6 +173,22 @@ internal class WaveData {
             public void Dispose() { }
         }
         #endregion
+    }
+
+    /// <summary>
+    /// 给 WaveData 的一个 WaveDataMask 的尾部 添加一个 WaveAttribute
+    /// </summary>
+    /// <param name="index"> 要设置的 WaveDataMask </param>
+    /// <param name="waveAttribute"> 新加的 WaveAttribute </param>
+    internal void AddAttributeLast(int index, WaveAttribute waveAttribute) {
+        waveDataMasks[index].AddLast(waveAttribute);
+    }
+
+    /// <summary>
+    /// 在 WaveData的尾部 添加一个 默认构造的空的WaveDataMask
+    /// </summary>
+    internal void AddMaskLast() {
+        waveDataMasks.Add(new WaveDataMask());
     }
 
     /// <summary> 波的数据的链表节点 </summary>
