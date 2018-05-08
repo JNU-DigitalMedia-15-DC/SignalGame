@@ -46,32 +46,12 @@ internal class WaveData {
     }
 
     /// <summary>
-    /// 叠加一个新的 WaveModification 到 WaveData 的 一个 WaveDataMask
+    /// 修改 WaveData 的 第index个 WaveDataMask
     /// </summary>
-    /// <param name="index"> 要设置的 WaveDataMask </param>
-    /// <param name="modification"> 要叠加的新 WaveModification </param>
+    /// <param name="index"> 被改 WaveDataMask 的索引 </param>
+    /// <param name="modification"> 修改量 </param>
     internal void ModifyByMask(int index, WaveModification modification) {
         waveDataMasks[index].Modification.StageWith(modification);
-    }
-
-    /// <summary> 设置 WaveData 的 一个WaveDataMask 的 WaveModification </summary>
-    /// <param name="index"> 要设置的 WaveDataMask </param>
-    /// <param name="newWaveModification"> 新的 WaveModification </param>
-    internal void SetWaveModification(
-        int index,
-        WaveModification newWaveModification
-    ) {
-        waveDataMasks[index].Modification.CopyFrom(newWaveModification);
-    }
-    /// <summary>
-    /// 试验性原型：获取 总和纸片wavedata的两个mask总和为modification
-    /// </summary>
-    /// <returns> 总和modification </returns>
-    internal WaveModification GetSumWaveModification(){
-        WaveModification sumModification = new WaveModification();
-        sumModification.StageWith(waveDataMasks[0].Modification);
-        sumModification.StageWith(waveDataMasks[1].Modification);
-        return sumModification;
     }
 
     /// <summary>
@@ -126,6 +106,7 @@ internal class WaveData {
             else
                 First = Last;
         }
+           
 
         #region 以下为 IEnumerable接口 的实现，遍历将会返回蒙版其下!!原始!!的 WaveAttribute
         public IEnumerator<WaveAttribute> GetEnumerator() {

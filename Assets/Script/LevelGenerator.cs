@@ -4,12 +4,10 @@
 internal class LevelGenerator : MonoBehaviour {
     /// <summary> 纸片预置体 </summary>
     public GameObject PaperPrefab;
-    public WaveInputController waveInputController;
+
 
     /// <summary> 纸片们的Holder </summary>
     private Transform papersParentTransform;
-
-
 
     private void Awake() {
         // 初始化Holder
@@ -30,9 +28,6 @@ internal class LevelGenerator : MonoBehaviour {
         WaveController[] waveControllers =
             new WaveController[levelData.papersData.Length];
 
-        // 设置纸片组 Holder 的位置（纸片组的左上角）
-        papersParentTransform.position = levelData.HolderPosition;
-
         // 生成纸片们，尚未给予 WaveData
         {
             int i = 0;
@@ -50,28 +45,26 @@ internal class LevelGenerator : MonoBehaviour {
         //     但会自动立即反应其下 加数纸片 的修改
         //     即创建自己的 waveDataMasks，记录别人的 WaveDataMask们
         WaveData sum = waveControllers[2].WaveData = new WaveData(waveDatas);
+
         // 配置目标纸片的 WaveData
         // 注：目标纸片 初始化的结果为最原始的 和视图纸片 叠加一个 目标修改
         //             且初始化后不能被修改
         //     即：如果关卡只修改 用户可操作纸片们的WaveModification
         //            则至少对和纸片的拷贝级别应该达到 拷贝每个WaveModification
         WaveData goal = new WaveData(sum);
-        // 对目标纸片的每个蒙版（每个用户可操作纸片）做目标修改
-        for (int i = 0; i < 2; ++i) {
-            goal.ModifyByMask(i, levelData.modifications[i]);
-        }
+        // 对目标纸片的第一个蒙版做目标修改
+        // 注：因为用户只操作一个纸片，故只需要对一个 Mask 做修改，约定为第一个
+        goal.ModifyByMask(0, levelData.modification);
         waveControllers[3].WaveData = goal;
-
-        // 关卡初始化完成，将数据引用传送给 WaveInputController
-        waveInputController.SetDatas(
-            papersData,
-            waveDatas,
-            waveControllers
-        );
-        // 激活 WaveInputController
-        waveInputController.enabled = true;
     }
 
+    private void CheckUserAnswer() {
+        WaveModification ans =
+            DataController.Instance.GetCurrentLevelData().modification;
+        WaveModification usr = new WaveModification(); // TODO
+        if ((usr - ans) / ans < /* theNumber */ 1)
+            /* SendMessage("Win this level.") */;
+    }
 
     /// <summary>
     /// 根据 PaperData 的位置和高宽信息构造一个纸片
@@ -80,11 +73,14 @@ internal class LevelGenerator : MonoBehaviour {
     /// <returns> 返回新纸片对应的 WaveController脚本 </returns>
     /// <remarks> 纸片的 waveData 请之后单独设置 </remarks>
     private WaveController GetPaper(PaperData paperData) {
-        // 实例化纸片
-        Transform paperTransform = Instantiate(PaperPrefab, papersParentTransform).transform;
-        paperTransform.localPosition = paperData.localPosition;
-        //保存 WaveController
-        WaveController waveController = paperTransform.GetComponent<WaveController>();
+        // 实例化纸片，保存 WaveController
+        WaveController waveController =
+           Instantiate(
+                        PaperPrefab,
+                        paperData.position,
+                        Quaternion.identity,
+                        papersParentTransform).
+        GetComponent<WaveController>();
 
         // 设置纸片宽和高
         waveController.PaperWeight = paperData.paperWeight;
