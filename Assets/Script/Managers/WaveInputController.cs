@@ -284,8 +284,12 @@ public class WaveInputController : MonoBehaviour {
     /// <returns></returns>
      private bool CheckUserAnswer(WaveController sum) {
 <<<<<<< HEAD
+<<<<<<< HEAD
          
 =======
+=======
+         /*
+>>>>>>> 添加MusicObject，把BGM接到了主程序上
          //TODO
 >>>>>>> Landy/paper rebase (#11)
          //两张纸片，分别拿到两个modification
@@ -330,11 +334,14 @@ public class WaveInputController : MonoBehaviour {
 =======
         WaveModification ans =
             DataController.Instance.GetCurrentLevelData().modification;
+
         //DataController.Instance.GetCurrentLevelData().papersData[2].
         WaveModification usr = sum.WaveData.GetSumWaveModification(); // TODO
         //Debug.Log(usr);
         float[] hexAttributes = { usr.A,usr.Omega,usr.Phi,ans.A,ans.Omega,ans.Phi };
-        return true;
+        return true; */
+
+        return false;
     }
 
 >>>>>>> Landy/paper rebase (#11)

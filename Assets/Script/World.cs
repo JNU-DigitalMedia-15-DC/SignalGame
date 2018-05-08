@@ -12,6 +12,8 @@ public class World : MonoBehaviour {
 	public BookShelfManager BM;
 	public BGSwaper BGSwaper;
 
+	public AudioManager AM;
+
 
 
 
