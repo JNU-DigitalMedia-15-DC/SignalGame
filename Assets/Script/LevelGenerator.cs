@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary> 关卡生成器 </summary>
 internal class LevelGenerator : MonoBehaviour {
@@ -72,7 +73,7 @@ internal class LevelGenerator : MonoBehaviour {
     }
 
     /// <summary> 初始化傅里叶变换与滤波关卡 </summary>
-    private void InitializeFourierLevel() {
+    public void InitializeFourierLevel() {
         DataController dc = DataController.Instance;
         /// <summary> 关卡数据 </summary>
         /// <remarks> 外部数据 </remarks>
@@ -80,8 +81,10 @@ internal class LevelGenerator : MonoBehaviour {
         /// <summary> 纸片数据 </summary>
         /// <remarks> 外部数据 </remarks>
         PaperData paperData = levelData.papersData[0];
+        /// <summary> 波参数组总数量 </summary>
+        int waveAttributesCount = paperData.waveAttributes.Length;
         /// <summary> 纸片总数量 </summary>
-        int papersCount = paperData.waveAttributes.Length + 1;
+        int papersCount = waveAttributesCount + 1;
         /// <summary> 纸片们的 WaveData们 </summary>
         WaveData[] waveDatas = new WaveData[papersCount];
         /// <summary> 纸片们的 WaveController们 </summary>
@@ -91,24 +94,63 @@ internal class LevelGenerator : MonoBehaviour {
         papersParentTransform.position = levelData.HolderPosition;
 
         // 生成纸片，尚未给予 WaveData
-        waveControllers[0] = GetPaper(paperData);
-        // 拷贝生成子波纸片
-        for (int i = 1; i < papersCount; ++i) {
-            waveControllers[i] = Instantiate(waveControllers[0], papersParentTransform);
+        for (int i = 0; i < papersCount; ++i) {
+            waveControllers[i] = GetPaper(paperData);
         }
 
-        // 配置所有纸片的 WaveData
-        for (int i = 0; i < papersCount; ++i) {
+        // 将波参数组外部数据导入到链表中
+        var waveAttributes = new LinkedList<WaveAttribute>(paperData.waveAttributes);
+        // 配置总纸片的 WaveData
+        // 新建一个空的 WaveData
+        waveControllers[0].WaveData = waveDatas[0] = new WaveData();
+        // 取出链表中第一个节点
+        var WALLNode = waveAttributes.First;
+        // 对于每一个波参数组……
+        for (int i = 0; i < waveAttributesCount; ++i) {
+            // 在此 WaveData 的尾部加一个新的 WaveDataMask，传入该波参数
+            waveDatas[0].AddMaskLast();
+            waveDatas[0].AddAttributeLast(i, WALLNode.Value);
+            // 步进链表节点指针
+            WALLNode = WALLNode.Next;
+        }
+
+        // 配置分纸片的 WaveData
+        // 取出链表中第一个和第二个节点
+        WALLNode = waveAttributes.First;
+        var WALLNodeNext = WALLNode.Next;
+        // 对于每一个分纸片……
+        for (int i = 1; i < papersCount; ++i) {
+            // 先从总波参数组链表中临时移出此波参数组
+            waveAttributes.Remove(WALLNode);
+
+            // 用剩下的波参数组初始化一个新 WaveData
             waveControllers[i].WaveData = waveDatas[i] =
-                new WaveData(paperData.waveAttributes);
+                new WaveData(waveAttributes);
+
+            // 在此 WaveData 的尾部加一个新的 WaveDataMask，传入临时移出的波参数
+            waveDatas[i].AddMaskLast();
+            waveDatas[i].AddAttributeLast(1, WALLNode.Value);
+
+            // 如果还不是是最后一个波参数组……
+            if (WALLNodeNext != null) {
+                // 将临时移出的波参数组添加回链表
+                waveAttributes.AddBefore(WALLNodeNext, WALLNode);
+                // 步进两个链表节点指针
+                WALLNode = WALLNode.Next;
+                WALLNodeNext = WALLNodeNext.Next;
+            } else { // 如果已经是最后一个波参数组……
+                // 将临时移出的波参数组添加回链表末尾
+                waveAttributes.AddLast(WALLNode);
+            }
         }
 
         // 关卡初始化完成，将数据引用传送给 FourierInputController
         FourierInputController fourierInputController = GetComponent<FourierInputController>();
         fourierInputController.SetDatas(
-            waveDatas,              // 用于插值调整（分离）波形
-            waveControllers,        // 用于调用 WaveController.Refresh()
-            papersParentTransform   // 用于插值调整纸片组位置
+            paperData.waveAttributes, // 用于滤波、根据频率计算推进终点
+            waveDatas, // 用于插值调整（分离）波形
+            waveControllers, // 用于调用 WaveController.Refresh()
+            papersParentTransform // 用于插值调整纸片组位置
         );
 
         // 激活 FourierInputController

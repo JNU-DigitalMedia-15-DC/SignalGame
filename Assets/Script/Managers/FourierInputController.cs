@@ -1,18 +1,21 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary> 傅里叶变换与滤波关卡的用户输入处理组件 </summary>
 public class FourierInputController : MonoBehaviour {
 
     /// <summary> 完成“时域到正中”、“正中到频域”旋转操作需要的横向滑动总量 </summary>
-    private const float rotateSwipe = 10f;
+    private const float rotateSwipe = 200f;
     /// <summary> 完成“波形分离”操作需要的横向滑动总量 </summary>
-    private const float subtractSwipe = 1.5f;
+    private const float subtractSwipe = 200f;
     /// <summary> 完成“波形推进”操作需要的横向滑动总量 </summary>
-    private const float pushSwipe = 1f;
+    private const float pushSwipe = 200f;
 
     /// <summary> deadZone半径（设备对微小操作的“不响应区域”的大小）） </summary>
     private const float deadZoneSize = 10f;
+    /// <summary> 频域图的频率最大值 </summary>
+    private const float maxOmega = 10f;
+    /// <summary> z轴推进量的最大值 </summary>
+    private const float maxZ = 10f;
 
     /// <summary> 上一帧结束时的用户输入点 </summary>
     private Vector2 prevInputPos = -Vector2.one;
@@ -20,7 +23,6 @@ public class FourierInputController : MonoBehaviour {
     Transform papersParentTransform;
     /// <summary> 上一帧结束时，用户的横向滑动量累和 所处的 操作区间 的 Index </summary>
     private int prevIntervalId = 0;
-    private WaveData.WaveDataNode waveDataNode;
     /// <summary> 是否正在划动（划动是否已经开始） </summary>
     private bool isSwiping = false;
     /// <summary> 划动是否仍在 deadZone 范畴内 </summary>
@@ -30,13 +32,22 @@ public class FourierInputController : MonoBehaviour {
     /// <summary> 这一帧开始时，用户的横向滑动量累和 </summary>
     private float newSwipeX;
     /// <summary> 波的参数组的总数 </summary>
-    private int waveAttributesCount = 3;
+    private int waveAttributesCount;
     /// <summary> totalSwipeX 和 newSwipeX 中左边的（数值较小的） </summary>
     private float leftSwipeX;
     /// <summary> totalSwipeX 和 newSwipeX 中右边的（数值较大的） </summary>
     private float rightSwipeX;
+    /// <summary> 一个 WaveModification 的临时变量，只许在Subtract()里用 </summary>
+    /// <remarks> 用于防止频繁 new WaveModification() </remarks>
+    private WaveModification tempWaveMod = new WaveModification();
+    /// <summary> 总纸片的所有波参数组 </summary>
+    private WaveAttribute[] waveAttributes;
+    /// <summary> 每个波参数组对应分纸片推进的终点的 z坐标 </summary>
+    private float[] destinationZ;
     /// <summary> 纸片们的 WaveController们 </summary>
     private WaveController[] waveControllers;
+    /// <summary> 纸片们的 Transform们 </summary>
+    private Transform[] paperTransforms;
     /// <summary> 纸片们的 WaveData们 </summary>
     private WaveData[] waveDatas;
 
@@ -53,24 +64,37 @@ public class FourierInputController : MonoBehaviour {
     /// <summary>
     /// 设置 FourierInputController 需要用到的数据
     /// </summary>
+    /// <param name="waveAttributes"> 总纸片的所有波参数组 </param>
     /// <param name="waveDatas"> 纸片们的 WaveData 们，用于插值调整（分离）波形 </param>
     /// <param name="waveControllers"> 纸片们的 WaveController 们，用于调用 WaveController.Refresh() </param>
     /// <param name="papersParentTransform"> 纸片组Holder 的 Transform </param>
     internal void SetDatas(
+        WaveAttribute[] waveAttributes,
         WaveData[] waveDatas,
         WaveController[] waveControllers,
         Transform papersParentTransform
     ) {
+        this.waveAttributes = waveAttributes;
+        destinationZ = new float[waveAttributes.Length];
+        int i = 0;
+        foreach (WaveAttribute waveAttribute in waveAttributes) {
+            destinationZ[i++] = Mathf.Lerp(0, maxZ,
+                InverseLerpClamped(0, maxOmega,
+                    waveAttribute.Omega)
+            );
+        }
         this.waveDatas = waveDatas;
         this.waveControllers = waveControllers;
+        paperTransforms = new Transform[waveControllers.Length];
+        i = 0;
+        foreach (WaveController waveController in waveControllers) {
+            paperTransforms[i++] = waveController.GetComponent<Transform>();
+        }
+
         this.papersParentTransform = papersParentTransform;
-        this.waveAttributesCount = waveControllers.Length - 1;
-        waveDataNode = waveDatas[0].GetWaveDataNodePrototype();
-    }
+        this.waveAttributesCount = waveAttributes.Length;
 
-    private void Awake() {
         // 预处理操作区间边界
-
         // 计算操作区间总数，每个波参数组对应两个操作区间，外加开始和最后两个旋转操作区间
         intervalsCount = waveAttributesCount * 2 + 2;
 
@@ -83,7 +107,7 @@ public class FourierInputController : MonoBehaviour {
         right[0] = rotateSwipe;
 
         // 设置每一个波参数组对应操作区间，i从1开始，总共waveAttributesCount次
-        for (int i = 1; i < waveAttributesCount + 1; ++i) {
+        for (i = 1; i < waveAttributesCount + 1; ++i) {
             // 由 1*2-1 == 1 知，第一个操作区间的index为 i*2-1，第二个为 i*2
             int first = i * 2 - 1, second = i * 2;
             left[first] = right[first - 1];
@@ -109,9 +133,7 @@ public class FourierInputController : MonoBehaviour {
         // Unity Editor 或电脑端使用鼠标输入
 
         // 如果鼠标左键……
-        if (Input.GetMouseButton(0)) {
-            firstInputPos = Input.mousePosition;
-        }
+        firstInputPos = Input.mousePosition;
         if (Input.GetMouseButtonDown(0)) {
             firstInputPhase = InputPhase.Began;
         } else if (Input.GetMouseButtonUp(0)) {
@@ -143,6 +165,9 @@ public class FourierInputController : MonoBehaviour {
         // 这样可以处理 TouchPhase.Began 之后紧接着 Ended Phase 的情况
         // （否则，isSwiping 会被设置为 false，于是这组 began-Ended 的处理便不会进行）
         if (firstInputPhase == InputPhase.Ended) {
+            // 划动处理结束，更新 totalSwipeX
+            totalSwipeX = newSwipeX;
+
             isSwiping = false;
         }
 
@@ -164,6 +189,7 @@ public class FourierInputController : MonoBehaviour {
         newSwipeX = totalSwipeX + deltaX;
         leftSwipeX = Mathf.Min(totalSwipeX, newSwipeX);
         rightSwipeX = Mathf.Max(totalSwipeX, newSwipeX);
+        Debug.Log(newSwipeX);
 
         /// <summary> 是否在向左划动 </summary>
         bool isSwipingLeft = deltaX < 0;
@@ -174,9 +200,6 @@ public class FourierInputController : MonoBehaviour {
             LerpInterval(prevIntervalId, newSwipeX);
             // 尝试步进区间index，如果成功进入新操作区间，继续循环
         } while (AdvanceInterval(ref prevIntervalId, isSwipingLeft));
-
-        // 划动处理结束，更新 totalSwipeX
-        totalSwipeX = newSwipeX;
     }
 
     /// <summary>
@@ -195,14 +218,20 @@ public class FourierInputController : MonoBehaviour {
         }
 
         // 如果步进后操作区间与划动区间无交集，返回 false
-        if (right[intervalId] < leftSwipeX ||
-            rightSwipeX < left[intervalId]) {
+        if (right[nextIntervalId] < leftSwipeX ||
+            rightSwipeX < left[nextIntervalId]) {
             return false;
         }
 
         // 测试成功，步进区间Id，返回true
         intervalId = nextIntervalId;
         return true;
+    }
+
+    /// <summary> 先钳制版的反插值函数 </summary>
+    private float InverseLerpClamped(float a, float b, float value) {
+        value = Mathf.Clamp(value, a, b);
+        return Mathf.InverseLerp(a, b, value);
     }
 
     /// <summary>
@@ -212,7 +241,7 @@ public class FourierInputController : MonoBehaviour {
     /// <param name="SwipeX"> 划动操作的横坐标 </param>
     private void LerpInterval(int intervalId, float SwipeX) {
         // 求出划动操作在操作区间的反插值
-        float inverseLerp = Mathf.InverseLerp(left[intervalId], right[intervalId], SwipeX);
+        float inverseLerp = InverseLerpClamped(left[intervalId], right[intervalId], SwipeX);
 
         // 如果是第一个划动操作区间……
         if (intervalId == 0) {
@@ -232,7 +261,7 @@ public class FourierInputController : MonoBehaviour {
         /// <remarks> intervalId 减去第一个旋转操作区间再除以 2 </remarks>
         int waveAttributeId = (intervalId - 1) / 2;
         // 如果是分离操作区间……
-        if (intervalId % 2 == 0) {
+        if (intervalId % 2 == 1) {
             // ……进行分离操作
             Subtract(waveAttributeId, inverseLerp);
         } else { // ……否则是推动操作区间……
@@ -250,33 +279,42 @@ public class FourierInputController : MonoBehaviour {
 
     /// <summary> 利用插值函数处理正中与频域之间的旋转 </summary>
     private void lastRotate(float inverseLerp) { // TODO
-        papersParentTransform.rotation = Quaternion.Euler(Vector3.up * 90);
-        papersParentTransform.Rotate(Vector3.right * Mathf.Lerp(0f, -30f, 1 - inverseLerp));
-        papersParentTransform.Rotate(Vector3.up * Mathf.Lerp(0f, -45f, 1 - inverseLerp));
-        if (inverseLerp >.99f) {
-            newSwipeX += 1f;
+        // 如果从正中视角切换到正对频域视角……
+        if (facingFrequencyDomain == false && inverseLerp >.99f) {
+            // 帮用户彻底转过去
+            // newSwipeX += 1f; // TODO
+            inverseLerp = 1f;
+            // 标记为已经正对频域
             facingFrequencyDomain = true;
-        } else {
+        }
+        // 如果从正对频域视角切换到正中视角
+        if (facingFrequencyDomain == true && inverseLerp < .9f) {
+            // 标记为不正对频域
             facingFrequencyDomain = false;
         }
+        papersParentTransform.rotation = Quaternion.Euler(Vector3.up * 90);
+        papersParentTransform.Rotate(Vector3.forward * Mathf.Lerp(0f, -30f, 1 - inverseLerp));
+        papersParentTransform.Rotate(Vector3.up * Mathf.Lerp(0f, -45f, 1 - inverseLerp));
     }
 
     /// <summary> 将单个正弦波从总波分离出来 </summary>
     private void Subtract(int waveAttributeId, float inverseLerp) {
-        // int waveId =
-        // if (inverseLerp < .01f) {
-        //     waveControllers[waveId]
-        // }
-        // waveDatas[0].GetWaveDataNodePrototype();
-        // waveDatas[waveId + 1].GetWaveDataNodePrototype();
+        // 处理总波
+        tempWaveMod.A = 1 - inverseLerp;
+        waveDatas[0].SetWaveModification(waveAttributeId, tempWaveMod);
+        waveControllers[0].Refresh();
+
+        // 处理分波
+        int paperId = waveAttributeId + 1;
+        waveDatas[paperId].SetWaveModification(0, tempWaveMod);
+        waveControllers[paperId].Refresh();
     }
 
     /// <summary> 将单个正弦波纸片向频率更高的位置推进 </summary>
     private void Push(int waveAttributeId, float inverseLerp) {
-        // 知道 transform
-        // 推的终点
-        // 反插值
-        // papersParentTransform
+        float z = Mathf.Lerp(0, destinationZ[waveAttributeId], inverseLerp);
+        int paperId = waveAttributeId + 1;
+        paperTransforms[paperId].localPosition = Vector3.forward * z;
     }
 
     // // 如果上一帧仍在 deadZone 内而这一帧移出了

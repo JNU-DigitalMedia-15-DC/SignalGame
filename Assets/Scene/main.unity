@@ -3481,6 +3481,7 @@ GameObject:
   - component: {fileID: 834115017}
   - component: {fileID: 834115019}
   - component: {fileID: 834115020}
+  - component: {fileID: 834115021}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -3537,6 +3538,17 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b22d641c1a44d7459bbf19e826ca816, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &834115021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 834115016}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf47848404871a41bc967478f0a89e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &858625770
@@ -7610,7 +7622,7 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 834115019}
-        m_MethodName: InitializeModifyLevel
+        m_MethodName: InitializeFourierLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
