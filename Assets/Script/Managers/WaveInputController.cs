@@ -21,9 +21,11 @@ public class WaveInputController : MonoBehaviour {
     // 纸片们的边界们的世界坐标，顺序依次为：左右下上
     private float[][] papersBounds = new float[2][];
     // 用户对纸片们的修改们（WaveModification们）（初始化为（1，1，0））
-    private WaveModification[] waveModifications = new WaveModification[2] {
+    private WaveModification[] usrWaveModifications = new WaveModification[2] {
         new WaveModification(), new WaveModification()
     };
+    //TODO
+    private WaveModification[] ansWaveModifications = new WaveModification[2];
     // 所有可以被修改的纸片的 WaveController
     private WaveController[] waveControllers = new WaveController[4];
     // 所有可以被修改的纸片的 WaveData
@@ -59,7 +61,8 @@ public class WaveInputController : MonoBehaviour {
     internal void SetDatas(
         PaperData[] papersData,
         WaveData[] waveDatas,
-        WaveController[] waveControllers
+        WaveController[] waveControllers,
+        WaveModification[] ansWaveModifications
     ) {
         for (int i = 0; i < 2; ++i) {
             // 获取纸片的边界，顺序：左右下上
@@ -68,6 +71,7 @@ public class WaveInputController : MonoBehaviour {
             // 记录纸片对应的 WaveData 和 WaveController
             this.waveDatas[i] = waveDatas[i];
             this.waveControllers[i] = waveControllers[i];
+            this.ansWaveModifications[i] = ansWaveModifications[i];
         }
         for (int i = 2; i < 4; ++i) {
             // 继续记录 纸片对应WaveController
@@ -225,7 +229,7 @@ public class WaveInputController : MonoBehaviour {
         waveController.Refresh();//被改动的波
         waveControllers[2].Refresh();//sum波
         waveControllers[3].Refresh();
-      
+
          if(CheckUserAnswer(waveControllers[2]))
         {
             //存在数据处理问题 
@@ -253,22 +257,46 @@ public class WaveInputController : MonoBehaviour {
     /// <param name="sum">总和纸片的wavecontroller</param>
     /// <returns></returns>
      private bool CheckUserAnswer(WaveController sum) {
-         //TODO
+         
          //两张纸片，分别拿到两个modification
          //分别做六元组求距离
          //足够近判断过关
          //通关的同时
          //是不是应该把getcurrentleveldata的modification改成数组或者两个modification
          //usr也应该是两个 waveController[0] wavecontroller[1]
-        WaveModification ans =
-            DataController.Instance.GetCurrentLevelData().modification;
-        //DataController.Instance.GetCurrentLevelData().papersData[2].
-        WaveModification usr = sum.WaveData.GetSumWaveModification(); // TODO
-        //Debug.Log(usr);
-        float[] hexAttributes = { usr.A,usr.Omega,usr.Phi,ans.A,ans.Omega,ans.Phi };
-        return true;
-    }
+         //TODO：给六元组赋值
+        float[,] hexAttributes = new float[2,6];
+        for(int i=0;i<2;i++)
+        {
+                hexAttributes[i,0]=usrWaveModifications[i].A;
+                hexAttributes[i,1]=usrWaveModifications[i].Omega;
+                hexAttributes[i,2]=usrWaveModifications[i].Phi;
+                hexAttributes[i,3]=ansWaveModifications[i].A;
+                hexAttributes[i,4]=ansWaveModifications[i].Omega;
+                hexAttributes[i,5]=ansWaveModifications[i].Phi;
+        }
+      
+        float[] distance = {0,0};
+        for(int i=0;i<2;i++)
+        {
+            for(int j=0;j<3;j++)
+            distance[i] += (hexAttributes[i,j+3]-hexAttributes[i,j]) * (hexAttributes[i,j+3]-hexAttributes[i,j]);
+            distance[i] = Mathf.Sqrt(distance[i]);
 
+        }
+        Debug.Log("distance 1: " + distance[0] + " distance 2:" + distance[1] );
+        return false;
+    }
+    public void DebugPass()
+    {
+        isPinching = false;
+        isSwiping = false;
+        isChangingANotPhi = true;
+        inDeadZone = true;
+        World.instance.MM.ClearMissions();
+        World.instance.MM.DebugNextSubMission();
+        this.enabled = false;
+    }
     // 根据屏幕坐标寻找要修改的纸片的 WaveModification 和 WaveController
     private bool FindWaveRefByScreenPos(
         Vector2 screenPointOne,
@@ -296,7 +324,7 @@ public class WaveInputController : MonoBehaviour {
                 }
 
                 // 记录用户要更改的 WaveModification
-                waveModification = waveModifications[i];
+                waveModification = usrWaveModifications[i];
                 waveModificationOrigin.CopyFrom(waveModification);
                 // 记录要应用更改的 WaveData 和 WaveController
                 waveData = waveDatas[i];

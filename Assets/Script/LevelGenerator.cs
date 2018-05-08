@@ -66,7 +66,8 @@ internal class LevelGenerator : MonoBehaviour {
         waveInputController.SetDatas(
             papersData,
             waveDatas,
-            waveControllers
+            waveControllers,
+            levelData.modifications
         );
         // 激活 WaveInputController
         waveInputController.enabled = true;
