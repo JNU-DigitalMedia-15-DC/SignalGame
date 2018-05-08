@@ -74,12 +74,6 @@ public class MissionsManager : MonoBehaviour {
 	/// </summary>
 	public void ClearMissions()
 	{
-<<<<<<< HEAD
-=======
-		/*NotifyEvent nEvent = new NotifyEvent(NotifyType.ClearMission,this.gameObject);
-		Debug.Log("I");
-		NotificationCenter.getInstance().postNotification(nEvent);*/
->>>>>>> Landy/paper rebase (#11)
 		GameObject[] papers = GameObject.FindGameObjectsWithTag("paper");
 		foreach(GameObject go in papers)
 		Destroy(go);
