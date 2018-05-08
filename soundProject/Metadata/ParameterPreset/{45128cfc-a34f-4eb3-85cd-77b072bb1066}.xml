@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.01.10.00">
+    <object class="ParameterPreset" id="{45128cfc-a34f-4eb3-85cd-77b072bb1066}">
+        <property name="name">
+            <value>stringsAmp</value>
+        </property>
+        <relationship name="folder">
+            <destination>{04cac83d-3c03-4f88-b067-86a66a7130ec}</destination>
+        </relationship>
+        <relationship name="parameter">
+            <destination>{66bafa10-e80a-4ece-9933-6f096d1c9519}</destination>
+        </relationship>
+    </object>
+    <object class="GameParameter" id="{66bafa10-e80a-4ece-9933-6f096d1c9519}">
+        <property name="initialValue">
+            <value>0</value>
+        </property>
+    </object>
+</objects>
