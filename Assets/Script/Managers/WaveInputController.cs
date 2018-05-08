@@ -78,7 +78,7 @@ public class WaveInputController : MonoBehaviour {
 
     private void Update() {
         int touchCount = 0;
-        Vector2 onePointPos = Vector2.zero;
+        Vector2 onePointPos = -Vector2.one;
         OnePointPhase onePointPhase = OnePointPhase.Unassigned;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
