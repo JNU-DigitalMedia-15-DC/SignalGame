@@ -46,8 +46,18 @@ public class WaveModification : WaveAttribute {
     /// </summary>
     /// <param name="other"> 要叠加的 WaveModification </param>
     internal void StageWith(WaveModification other) {
-        A *= other.A;
+        A += other.A;
         Omega *= other.Omega;
         Phi += other.Phi;
+    }
+
+    /// <summary>
+    /// 拷贝另一个 WaveModification 的内容
+    /// </summary>
+    /// <param name="other"> 要拷贝的 WaveModification </param>
+    internal void CopyFrom(WaveModification other) {
+        A = other.A;
+        Omega = other.Omega;
+        Phi = other.Phi;
     }
 }
