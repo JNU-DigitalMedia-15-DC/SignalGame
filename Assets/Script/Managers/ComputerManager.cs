@@ -33,13 +33,13 @@ public class ComputerManager : MonoBehaviour {
 	/// </summary>
 	public void InitiateEmail()
 	{
-		description.text = currentEmailDescriptions[GameManager.Instance.currentMainIndex-1];
-		emailPageIndex = GameManager.Instance.currentMainIndex-1;
+		description.text = currentEmailDescriptions[GameManager.Instance.MainIndex-1];
+		emailPageIndex = GameManager.Instance.MainIndex-1;
 	}
 	
 	public void NextEmail()
 	{
-		if(emailPageIndex == currentEmailDescriptions.Length || emailPageIndex>=GameManager.Instance.currentMainIndex-1)
+		if(emailPageIndex == currentEmailDescriptions.Length || emailPageIndex>=GameManager.Instance.MainIndex-1)
 		return;
 		else emailPageIndex++;
 		ShowDescription();

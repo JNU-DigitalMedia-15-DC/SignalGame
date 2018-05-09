@@ -19,8 +19,10 @@ public class TextsFade : MonoBehaviour {
 	void Start(){
 		for (int i = 0; i < texts.Length; i++)
 		{
-			textTweens[i] = texts[i].DOFade(1,0.6f).Pause().SetAutoKill(false).OnComplete( ()=> {textTweens[i].Rewind();});
-			textRTweens[i] = texts[i].DOFade(0,0.2f).Pause().SetAutoKill(false).OnComplete( ()=> {textRTweens[i].Rewind();});
+			textTweens[i] = texts[i].DOFade(1,0.6f).Pause().SetAutoKill(true);
+			//textTweens[i].OnComplete( ()=> {textTweens[i].Rewind();});
+			textRTweens[i] = texts[i].DOFade(0,0.2f).Pause().SetAutoKill(true);
+			//textRTweens[i].OnComplete( ()=> {textRTweens[i].Rewind();});
 			Debug.Log("complete " + i);
 		}
 	}
@@ -32,7 +34,7 @@ public class TextsFade : MonoBehaviour {
 		{
 			tw.Play();
 		}
-		Invoke("HideTexts",10f);
+		Invoke("HideTexts",7f);
 	} 
 	public void HideTexts()
 	{

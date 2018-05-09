@@ -6,6 +6,7 @@ internal class LevelGenerator : MonoBehaviour {
     /// <summary> 纸片预置体 </summary>
     public GameObject PaperPrefab;
     public WaveInputController waveInputController;
+    public FourierInputController fourierInputController;
 
     /// <summary> 纸片们的Holder </summary>
     private Transform papersParentTransform;
@@ -15,6 +16,13 @@ internal class LevelGenerator : MonoBehaviour {
     private void Awake() {
         // 初始化Holder
         papersParentTransform = new GameObject("Papers").transform;
+    }
+
+    public void InitializeLevelByIndex()
+    {
+        if(GameManager.Instance.GetTotalMissionIndex()==3)
+        InitializeFourierLevel();
+        else InitializeModifyLevel();
     }
 
     /// <summary> 初始化用户修改纸片的关卡 </summary>
@@ -147,7 +155,6 @@ internal class LevelGenerator : MonoBehaviour {
         }
 
         // 关卡初始化完成，将数据引用传送给 FourierInputController
-        FourierInputController fourierInputController = GetComponent<FourierInputController>();
         fourierInputController.SetDatas(
             paperData.waveAttributes, // 用于滤波、根据频率计算推进终点
             waveDatas, // 用于插值调整（分离）波形
