@@ -34,7 +34,7 @@ public class TextsFade : MonoBehaviour {
 		{
 			tw.Play();
 		}
-		Invoke("HideTexts",7f);
+		Invoke("HideTexts",3f);
 	} 
 	public void HideTexts()
 	{
