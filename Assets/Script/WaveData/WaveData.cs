@@ -69,16 +69,6 @@ internal class WaveData {
     ) {
         waveDataMasks[index].Modification.CopyFrom(newWaveModification);
     }
-    /// <summary>
-    /// 试验性原型：获取 总和纸片wavedata的两个mask总和为modification
-    /// </summary>
-    /// <returns> 总和modification </returns>
-    internal WaveModification GetSumWaveModification(){
-        WaveModification sumModification = new WaveModification();
-        sumModification.StageWith(waveDataMasks[0].Modification);
-        sumModification.StageWith(waveDataMasks[1].Modification);
-        return sumModification;
-    }
 
     /// <summary>
     /// 获取波在横坐标为 x 时的函数值
