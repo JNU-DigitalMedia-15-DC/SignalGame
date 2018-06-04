@@ -229,7 +229,7 @@ public class WaveInputController : MonoBehaviour {
         waveController.Refresh();//被改动的波
         waveControllers[2].Refresh();//sum波
         waveControllers[3].Refresh();
-        World.instance.AM.DebugSetWaveAmp(usrWaveModifications[0].A,usrWaveModifications[1].A);
+        World.instance.AM.DebugSetModifyWaveAmp(usrWaveModifications[0].A,usrWaveModifications[1].A);
         /* if(CheckUserAnswer(waveControllers[2]))
         {
             isPinching = false;

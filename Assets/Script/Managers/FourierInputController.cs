@@ -221,7 +221,7 @@ public class FourierInputController : MonoBehaviour {
                     float deltaY = inputPos.y - prevInputPos.y;
                     EQ[EQId] = Mathf.Clamp(EQ[EQId] + deltaY * EQSpeed, 0, maxEQ);
                     Debug.Log(EQ[EQId]);
-
+                    World.instance.AM.DebugSetFourierWaveAmp(EQ[0],EQ[1],EQ[2]);//更改eq参数
                     int right = System.Convert.ToInt32(
                         (EQId + 1) * waveAttributesCount / 3f
                     );

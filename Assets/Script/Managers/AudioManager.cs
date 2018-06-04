@@ -102,19 +102,16 @@ public class AudioManager : MonoBehaviour {
 				break;
 		}
 	}
-	public void DebugSetWaveAmp(float lwa,float hwa){
+	public void DebugSetModifyWaveAmp(float lwa,float hwa){
 		lwa = Mathf.Min(Mathf.Abs(lwa),2f);
 		hwa = Mathf.Min(Mathf.Abs(hwa),2f);
-		Debug.Log(lwa);
-
-		switch(GameManager.Instance.GetTotalMissionIndex()){
-			case 1 :
-			case 2 :
-				lowWaveAmp = lwa/2f;
-				highWaveAmp = hwa/2f;
-				break;
-			case 3 :
-				break;
-		}
+		lowWaveAmp = lwa/2f;
+		highWaveAmp = hwa/2f;
+		
+	}
+	public void DebugSetFourierWaveAmp(float lp,float bp,float hp ){
+		lowPass = 0.8f*lp;
+		bandPass = 0.8f*bp;
+		highPass = 0.8f*hp;
 	}
 }
