@@ -13,8 +13,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: 114718815019059502}
-  - {fileID: 114774805820083056}
-  - {fileID: 114043713630093612}
+  - {fileID: 114654665717311802}
+  - {fileID: 114183869978649926}
   EditorEvents:
   - {fileID: 114449578945367632}
   - {fileID: 114538467689781696}
@@ -24,9 +24,9 @@ MonoBehaviour:
   - {fileID: 114020454636172044}
   - {fileID: 114895625451080354}
   - {fileID: 114876576579374154}
-  MasterBankRef: {fileID: 114774805820083056}
+  MasterBankRef: {fileID: 114654665717311802}
   StringsBankRef: {fileID: 114718815019059502}
-  stringsBankWriteTime: 636614590111232698
+  stringsBankWriteTime: 636614194969866899
   cacheVersion: 2
 --- !u!114 &114015050875797210
 MonoBehaviour:
@@ -40,6 +40,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: musicBoxAmp
+  Min: 0
+  Max: 1
+  Default: 0
+--- !u!114 &114018476016856560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: stringsAmp
   Min: 0
   Max: 1
   Default: 0
@@ -57,7 +72,7 @@ MonoBehaviour:
   Path: event:/UI/StayInWorkbench
   guid: 96478162cb737548b05aa9e953280585
   Banks:
-  - {fileID: 114043713630093612}
+  - {fileID: 114183869978649926}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -81,7 +96,7 @@ MonoBehaviour:
   FileSizes:
   - Name: Desktop
     Value: 51904
-  Exists: 1
+  Exists: 0
 --- !u!114 &114062436888097644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,6 +157,21 @@ MonoBehaviour:
   Min: 0
   Max: 1
   Default: 0
+--- !u!114 &114119683527446572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: isWin
+  Min: 0
+  Max: 1
+  Default: 0
 --- !u!114 &114120147886975944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +187,39 @@ MonoBehaviour:
   Min: 0
   Max: 1
   Default: 0
+--- !u!114 &114126065466001184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: isTransforming
+  Min: 0
+  Max: 1
+  Default: 0
+--- !u!114 &114183869978649926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: "D:\\\u5B66\u4E1A\\MyUnityProjects\\SignalGame\\soundProject\\Build\\Desktop\\UI.bank"
+  lastModified: 636614194969886522
+  LoadResult: 0
+  FileSizes:
+  - Name: Desktop
+    Value: 51904
+  Exists: 1
 --- !u!114 &114216730253823576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,6 +295,21 @@ MonoBehaviour:
   Min: 0
   Max: 1
   Default: 0
+--- !u!114 &114279500648898194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: highPass
+  Min: 0
+  Max: 1
+  Default: 0
 --- !u!114 &114353264415318816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,7 +324,7 @@ MonoBehaviour:
   Path: event:/UI/OpenBook
   guid: 1c041c899cd8dd45ab2211bb2b3a2da2
   Banks:
-  - {fileID: 114043713630093612}
+  - {fileID: 114183869978649926}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -302,6 +380,36 @@ MonoBehaviour:
   Min: 0
   Max: 1
   Default: 0
+--- !u!114 &114390855510497934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: lowWaveAmp
+  Min: 0
+  Max: 1
+  Default: 0
+--- !u!114 &114397762803857100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: lowPass
+  Min: 0
+  Max: 1
+  Default: 0
 --- !u!114 &114410610535002640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -331,13 +439,28 @@ MonoBehaviour:
   Path: event:/UI/OpenLetterOrPhoto
   guid: 5e50e8fee4da744eaefbaa36e2bcef05
   Banks:
-  - {fileID: 114043713630093612}
+  - {fileID: 114183869978649926}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
   Parameters: []
   MinDistance: 0
   MaxDistance: 0
+--- !u!114 &114437849163555210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: musicBoxAmp
+  Min: 0
+  Max: 1
+  Default: 0
 --- !u!114 &114449578945367632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,13 +475,28 @@ MonoBehaviour:
   Path: event:/UI/Back
   guid: 90a0f810b0754d4d8a14001402ea0e17
   Banks:
-  - {fileID: 114774805820083056}
+  - {fileID: 114654665717311802}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
   Parameters: []
   MinDistance: 0
   MaxDistance: 0
+--- !u!114 &114476517720346092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: highWaveAmp
+  Min: 0
+  Max: 1
+  Default: 0
 --- !u!114 &114538467689781696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,21 +511,21 @@ MonoBehaviour:
   Path: event:/Music/BackGroundMusic
   guid: 9ed55816bcd3aa4e91f49611bacd72d3
   Banks:
-  - {fileID: 114774805820083056}
+  - {fileID: 114654665717311802}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
   Parameters:
-  - {fileID: 114120147886975944}
-  - {fileID: 114921291257788722}
-  - {fileID: 114253616580757766}
-  - {fileID: 114258085887988318}
-  - {fileID: 114095954006805830}
-  - {fileID: 114778448223782536}
-  - {fileID: 114915401883146212}
-  - {fileID: 114612417009189584}
-  - {fileID: 114937510284898570}
-  - {fileID: 114410610535002640}
+  - {fileID: 114437849163555210}
+  - {fileID: 114397762803857100}
+  - {fileID: 114119683527446572}
+  - {fileID: 114476517720346092}
+  - {fileID: 114018476016856560}
+  - {fileID: 114390855510497934}
+  - {fileID: 114279500648898194}
+  - {fileID: 114126065466001184}
+  - {fileID: 114930351518954964}
+  - {fileID: 114701767544312172}
   MinDistance: 0
   MaxDistance: 0
 --- !u!114 &114541377417189734
@@ -453,6 +591,25 @@ MonoBehaviour:
   Min: 0
   Max: 1
   Default: 0
+--- !u!114 &114654665717311802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Path: "D:\\\u5B66\u4E1A\\MyUnityProjects\\SignalGame\\soundProject\\Build\\Desktop\\Master
+    Bank.bank"
+  lastModified: 636614198995212650
+  LoadResult: 0
+  FileSizes:
+  - Name: Desktop
+    Value: 1748480
+  Exists: 1
 --- !u!114 &114670950849578100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -468,6 +625,21 @@ MonoBehaviour:
   Min: 0
   Max: 1
   Default: 0
+--- !u!114 &114701767544312172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: bassAmp
+  Min: 0
+  Max: 1
+  Default: 0
 --- !u!114 &114718815019059502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -480,7 +652,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Path: soundProject\Build\Desktop\Master Bank.strings.bank
-  lastModified: 636614590111232698
+  lastModified: 636614194969866899
   LoadResult: 0
   FileSizes:
   - Name: Desktop
@@ -518,7 +690,7 @@ MonoBehaviour:
   FileSizes:
   - Name: Desktop
     Value: 1748480
-  Exists: 1
+  Exists: 0
 --- !u!114 &114778448223782536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -593,7 +765,7 @@ MonoBehaviour:
   Path: event:/UI/ExitWorkbench
   guid: fb6abfc18ff8c04db52793a85bfb8d3d
   Banks:
-  - {fileID: 114043713630093612}
+  - {fileID: 114183869978649926}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -614,7 +786,7 @@ MonoBehaviour:
   Path: event:/UI/TurnPage
   guid: c07c16773c990844a1456c29fca25cb3
   Banks:
-  - {fileID: 114043713630093612}
+  - {fileID: 114183869978649926}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -635,7 +807,7 @@ MonoBehaviour:
   Path: event:/UI/ClickBtn
   guid: 7845e7b4fa796b47b67a025c22c11a1b
   Banks:
-  - {fileID: 114043713630093612}
+  - {fileID: 114183869978649926}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -714,6 +886,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Name: lowPass
+  Min: 0
+  Max: 1
+  Default: 0
+--- !u!114 &114930351518954964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: bandPass
   Min: 0
   Max: 1
   Default: 0
